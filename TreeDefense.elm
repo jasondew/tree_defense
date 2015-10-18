@@ -1,28 +1,35 @@
 module TreeDefense where
 
-import Graphics.Element exposing (Element, show)
+import Graphics.Element as Element
 import Graphics.Collage as Collage exposing (Form, Shape)
+import Graphics.Input as Input
 import Color exposing (Color)
 import Time exposing (Time)
 import Array exposing (Array)
 import Text
 import Window
 import Debug
+import Mouse
 
-main : Signal Element
+main : Signal Element.Element
 main =
-  Signal.map2 view model Window.dimensions
+  Signal.map2 (view actions.address) model Window.dimensions
 
 
 -- MODEL
 
 
 type alias Model = {
+  state: State,
   map: Map,
   creeps: List Creep,
   towers: List Tower,
   projectiles: List Projectile
 }
+
+type State =
+  Play |
+  Pause
 
 type alias Map = Array (Array Tile)
 
@@ -76,7 +83,7 @@ defaultCreeps =
 
 initialModel : Model
 initialModel =
-  Model defaultMap defaultCreeps [Tower (2, 6) 1 2, Tower (5, 2) 2 1] []
+  Model Play defaultMap defaultCreeps [Tower (2, 6) 1 2, Tower (5, 2) 2 1] []
 
 model : Signal Model
 model =
@@ -88,6 +95,8 @@ model =
 
 type Action =
   NoOp |
+  StateChange State |
+  Click Position |
   Tick Time
 
 update : Action -> Model -> Model
@@ -96,15 +105,31 @@ update action model =
     NoOp ->
       model
 
-    Tick time ->
+    StateChange newState ->
+      { model | state <- Debug.watch "state" newState }
+
+    Click position ->
       let
-        updatedCreeps = List.filterMap (updateCreep model.map) model.creeps
-        projectiles = List.filterMap (projectile updatedCreeps) (Debug.watch "towers" model.towers)
+        alreadyExists = List.any (\tower -> tower.position == position) model.towers
+        outsideMap = List.any (\x -> x >= Array.length model.map) [fst position, snd position]
       in
-        { model |
-          creeps <- Debug.watch "creeps" (creepsAfterProjectiles projectiles updatedCreeps),
-          projectiles <- Debug.watch "projectiles" projectiles
-        }
+        if alreadyExists || outsideMap
+        then model
+        else { model | towers <- (Tower position 1 2) :: model.towers }
+
+    Tick time ->
+      case model.state of
+        Play ->
+          let
+            updatedCreeps = List.filterMap (updateCreep model.map) model.creeps
+            projectiles = List.filterMap (projectile updatedCreeps) (Debug.watch "towers" model.towers)
+          in
+            { model |
+              creeps <- Debug.watch "creeps" (creepsAfterProjectiles projectiles updatedCreeps),
+              projectiles <- Debug.watch "projectiles" projectiles
+            }
+        Pause ->
+          model
 
 creepsAfterProjectiles : List Projectile -> List Creep -> List Creep
 creepsAfterProjectiles projectiles creeps =
@@ -147,7 +172,7 @@ updateCreep map creep =
                      previousPosition <- Just creep.position
                    }
             Nothing ->
-              Just creep
+              Just creep -- TODO: No path/blocked
         False ->
           Nothing
 
@@ -203,37 +228,44 @@ tileAt map (x, y) =
 -- SIGNALS
 
 
-mailbox : Signal.Mailbox Action
-mailbox =
-  Signal.mailbox NoOp
-
-actions : Signal Action
+actions : Signal.Mailbox Action
 actions =
-  mailbox.signal
-
-address : Signal.Address Action
-address =
-  mailbox.address
+  Signal.mailbox NoOp
 
 clockTicks : Signal Action
 clockTicks =
   Signal.map Tick <| Time.fps 5
 
+mouseClicks : Signal Action
+mouseClicks =
+  Signal.sampleOn Mouse.clicks Mouse.position
+  |> Signal.map inverseTranslate
+  |> Signal.map Click
+
 inputs : Signal Action
 inputs =
-  Signal.mergeMany [actions, clockTicks]
+  Signal.mergeMany [actions.signal, clockTicks, mouseClicks]
 
 
 -- VIEW
 
 
-view : Model -> (Int, Int) -> Element
-view model (width, height) =
-  List.filterMap creepView model.creeps
-  |> List.append (List.map towerView model.towers)
-  |> List.append (List.map projectileView model.projectiles)
-  |> List.append [mapView model.map]
-  |> Collage.collage width height
+view : Signal.Address Action -> Model -> (Int, Int) -> Element.Element
+view address model (width, height) =
+  let
+    mapSize = (round tileSize) * (Array.length model.map)
+    graphics = List.filterMap creepView model.creeps
+               |> List.append (List.map towerView model.towers)
+               |> List.append (List.map projectileView model.projectiles)
+               |> List.append [mapView model.map]
+               |> Collage.group
+               |> Collage.move ((toFloat -mapSize/2) + tileSize, (toFloat mapSize/2) - tileSize)
+  in
+    [
+      Collage.collage mapSize mapSize [graphics],
+      Element.container 150 100 Element.middle (controlsView address model.state)
+    ]
+    |> Element.flow Element.right
 
 projectileView : Projectile -> Form
 projectileView projectile =
@@ -267,6 +299,17 @@ creepView creep =
       |> Collage.move (translate creep.position)
       |> Just
 
+controlsView : Signal.Address Action -> State -> Element.Element
+controlsView address state =
+  let
+    element = case state of
+                Play ->
+                  Input.button (Signal.message address (StateChange Pause)) "Pause"
+                Pause ->
+                  Input.button (Signal.message address (StateChange Play)) "Play"
+  in
+    element
+
 mapView : Map -> Form
 mapView map =
   Array.toIndexedList map
@@ -296,7 +339,14 @@ tileView position tile =
 
 translate : Position -> (Float, Float)
 translate (x, y) =
-  (toFloat x * tileSize - 450, toFloat -y * tileSize + 300)
+  (toFloat x * tileSize, toFloat -y * tileSize)
+
+inverseTranslate : (Int, Int) -> Position
+inverseTranslate (x, y) =
+  (
+    truncate ((toFloat x - tileSize / 2) / tileSize),
+    truncate ((toFloat y - tileSize / 2) / tileSize)
+  )
 
 tileSize : Float
 tileSize = 60

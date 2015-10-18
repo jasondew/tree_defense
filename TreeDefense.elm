@@ -30,17 +30,19 @@ type alias Creep = {
   position: Position,
   previousPosition: Maybe Position,
   delay: Maybe Int,
-  color: Color
+  color: Color,
+  health: Int
 }
 
 type alias Tower = {
   position: Position,
-  radius: Int
+  radius: Int,
+  damage: Int
 }
 
 type alias Projectile = {
-  source: Tower,
-  target: Creep
+  tower: Tower,
+  creep: Creep
 }
 
 type alias Position = (Int, Int)
@@ -67,14 +69,14 @@ defaultMap =
 defaultCreeps : List Creep
 defaultCreeps =
   [
-    Creep (0, 3) Nothing Nothing Color.lightBlue,
-    Creep (0, 3) Nothing (Just 2) Color.lightRed,
-    Creep (0, 3) Nothing (Just 7) Color.lightGreen
+    Creep (0, 3) Nothing Nothing Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 5) Color.lightGreen 10,
+    Creep (0, 3) Nothing (Just 10) Color.red 20
   ]
 
 initialModel : Model
 initialModel =
-  Model defaultMap defaultCreeps [Tower (2, 6) 1, Tower (5, 2) 2] []
+  Model defaultMap defaultCreeps [Tower (2, 6) 1 2, Tower (5, 2) 2 1] []
 
 model : Signal Model
 model =
@@ -96,12 +98,31 @@ update action model =
 
     Tick time ->
       let
-        updatedCreeps = updateCreeps model.map model.creeps
+        updatedCreeps = List.filterMap (updateCreep model.map) model.creeps
+        projectiles = List.filterMap (projectile updatedCreeps) (Debug.watch "towers" model.towers)
       in
         { model |
-          creeps <- Debug.watch "creeps" updatedCreeps,
-          projectiles <- Debug.watch "projectiles" (List.filterMap (projectile updatedCreeps) (Debug.watch "towers" model.towers))
+          creeps <- Debug.watch "creeps" (creepsAfterProjectiles projectiles updatedCreeps),
+          projectiles <- Debug.watch "projectiles" projectiles
         }
+
+creepsAfterProjectiles : List Projectile -> List Creep -> List Creep
+creepsAfterProjectiles projectiles creeps =
+  List.filterMap (creepAfterProjectiles projectiles) creeps
+
+creepAfterProjectiles : List Projectile -> Creep -> Maybe Creep
+creepAfterProjectiles projectiles creep =
+  let
+    firingTowers = projectiles
+                   |> List.filter (\projectile -> projectile.creep == creep)
+                   |> List.map .tower
+    totalDamage = firingTowers
+                  |> List.map .damage
+                  |> List.sum
+  in
+    if totalDamage > creep.health
+    then Nothing
+    else Just { creep | health <- creep.health - totalDamage }
 
 projectile : List Creep -> Tower -> Maybe Projectile
 projectile creeps tower =
@@ -110,21 +131,6 @@ projectile creeps tower =
   in
     List.head creepsInRange
     |> Maybe.map (Projectile tower)
-
-inRange : Tower -> Creep -> Bool
-inRange tower creep =
-  distance tower.position creep.position <= tower.radius
-
-distance : Position -> Position -> Int
-distance (x1, y1) (x2, y2) =
-  (x1 - x2) ^ 2 + (y1 - y2) ^ 2
-  |> toFloat
-  |> sqrt
-  |> round
-
-updateCreeps : Map -> List Creep -> List Creep
-updateCreeps map creeps =
-  List.filterMap (updateCreep map) creeps
 
 updateCreep : Map -> Creep -> Maybe Creep
 updateCreep map creep =
@@ -154,6 +160,17 @@ inBounds map (x, y) =
            <| Array.get 0 map
   in
     x < (columns - 1) && y < (rows - 1)
+
+inRange : Tower -> Creep -> Bool
+inRange tower creep =
+  distance tower.position creep.position <= tower.radius
+
+distance : Position -> Position -> Int
+distance (x1, y1) (x2, y2) =
+  (x1 - x2) ^ 2 + (y1 - y2) ^ 2
+  |> toFloat
+  |> sqrt
+  |> round
 
 nextPosition : Map -> Creep -> Maybe Position
 nextPosition map creep =
@@ -214,8 +231,18 @@ view : Model -> (Int, Int) -> Element
 view model (width, height) =
   List.filterMap creepView model.creeps
   |> List.append (List.map towerView model.towers)
+  |> List.append (List.map projectileView model.projectiles)
   |> List.append [mapView model.map]
   |> Collage.collage width height
+
+projectileView : Projectile -> Form
+projectileView projectile =
+  let
+    lineStyle = Collage.defaultLine
+  in
+    Collage.segment (translate projectile.tower.position)
+                    (translate projectile.creep.position)
+    |> Collage.traced lineStyle
 
 towerView : Tower -> Form
 towerView tower =
@@ -269,7 +296,7 @@ tileView position tile =
 
 translate : Position -> (Float, Float)
 translate (x, y) =
-  (toFloat x * tileSize - 400, toFloat -y * tileSize + 400)
+  (toFloat x * tileSize - 450, toFloat -y * tileSize + 300)
 
 tileSize : Float
 tileSize = 60

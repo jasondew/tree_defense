@@ -24,7 +24,8 @@ type alias Model = {
   map: Map,
   creeps: List Creep,
   towers: List Tower,
-  projectiles: List Projectile
+  projectiles: List Projectile,
+  lives: Int
 }
 
 type State =
@@ -77,13 +78,23 @@ defaultCreeps : List Creep
 defaultCreeps =
   [
     Creep (0, 3) Nothing Nothing Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 5) Color.lightGreen 10,
-    Creep (0, 3) Nothing (Just 10) Color.red 20
+    Creep (0, 3) Nothing (Just 1) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 2) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 3) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 4) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 5) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 10) Color.red 20,
+    Creep (0, 3) Nothing (Just 15) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 16) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 17) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 18) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 19) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 20) Color.lightBlue 10
   ]
 
 initialModel : Model
 initialModel =
-  Model Play defaultMap defaultCreeps [Tower (2, 6) 1 2, Tower (5, 2) 2 1] []
+  Model Pause defaultMap defaultCreeps [Tower (2, 6) 1 2, Tower (5, 2) 2 1] [] 10
 
 model : Signal Model
 model =
@@ -122,12 +133,19 @@ update action model =
         Play ->
           let
             updatedCreeps = List.filterMap (updateCreep model.map) model.creeps
+            escapedCreepCount = List.length model.creeps - List.length updatedCreeps
             projectiles = List.filterMap (projectile updatedCreeps) (Debug.watch "towers" model.towers)
+            newLives = Debug.watch "lives" (model.lives - escapedCreepCount)
           in
-            { model |
-              creeps <- Debug.watch "creeps" (creepsAfterProjectiles projectiles updatedCreeps),
-              projectiles <- Debug.watch "projectiles" projectiles
-            }
+            if newLives > 0
+            then
+              { model |
+                creeps <- Debug.watch "creeps" (creepsAfterProjectiles projectiles updatedCreeps),
+                projectiles <- Debug.watch "projectiles" projectiles,
+                lives <- newLives
+              }
+            else
+              { model | lives <- 0 }
         Pause ->
           model
 
@@ -163,17 +181,13 @@ updateCreep map creep =
     Just delay ->
       Just { creep | delay <- if delay == 0 then Nothing else Just (delay - 1) }
     Nothing ->
-      case inBounds map creep.position of
-        True ->
-          case nextPosition map creep of
-            Just newPosition ->
-              Just { creep |
-                     position <- newPosition,
-                     previousPosition <- Just creep.position
-                   }
-            Nothing ->
-              Just creep -- TODO: No path/blocked
-        False ->
+      case nextPosition map creep of
+        Just newPosition ->
+          Just { creep |
+                 position <- newPosition,
+                 previousPosition <- Just creep.position
+               }
+        Nothing ->
           Nothing
 
 inBounds : Map -> Position -> Bool
@@ -263,7 +277,10 @@ view address model (width, height) =
   in
     [
       Collage.collage mapSize mapSize [graphics],
-      Element.container 150 100 Element.middle (controlsView address model.state)
+      Element.flow Element.down [
+        Element.container 150 75 Element.midBottom (controlsView address model.state),
+        Element.container 150 50 Element.middle (Element.centered (Text.fromString ("♥ " ++ (toString model.lives))))
+      ]
     ]
     |> Element.flow Element.right
 

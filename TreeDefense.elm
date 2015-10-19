@@ -21,16 +21,22 @@ main =
 
 type alias Model = {
   state: State,
+  outcome: Maybe Outcome,
   map: Map,
   creeps: List Creep,
   towers: List Tower,
   projectiles: List Projectile,
-  lives: Int
+  lives: Int,
+  money: Int
 }
 
 type State =
   Play |
   Pause
+
+type Outcome =
+  Won |
+  Lost
 
 type alias Map = Array (Array Tile)
 
@@ -77,24 +83,30 @@ defaultMap =
 defaultCreeps : List Creep
 defaultCreeps =
   [
-    Creep (0, 3) Nothing Nothing Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 1) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 2) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 3) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 4) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 5) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 10) Color.red 20,
-    Creep (0, 3) Nothing (Just 15) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 16) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 17) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 18) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 19) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 20) Color.lightBlue 10
+    Creep (0, 3) Nothing Nothing   Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just  1) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just  2) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just  3) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 15) Color.red 20,
+    Creep (0, 3) Nothing (Just 20) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 21) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 22) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 23) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 24) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 25) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 35) Color.red 20,
+    Creep (0, 3) Nothing (Just 45) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 46) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 47) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 48) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 49) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 50) Color.lightBlue 10,
+    Creep (0, 3) Nothing (Just 60) Color.darkRed 30
   ]
 
 initialModel : Model
 initialModel =
-  Model Pause defaultMap defaultCreeps [Tower (2, 6) 1 2, Tower (5, 2) 2 1] [] 10
+  Model Pause Nothing defaultMap defaultCreeps [] [] 10 150
 
 model : Signal Model
 model =
@@ -108,6 +120,7 @@ type Action =
   NoOp |
   StateChange State |
   Click Position |
+  Reset |
   Tick Time
 
 update : Action -> Model -> Model
@@ -121,31 +134,47 @@ update action model =
 
     Click position ->
       let
+        towerCost = 50
+        cantAfford = towerCost > model.money
         alreadyExists = List.any (\tower -> tower.position == position) model.towers
         outsideMap = List.any (\x -> x >= Array.length model.map) [fst position, snd position]
       in
-        if alreadyExists || outsideMap
+        if cantAfford || alreadyExists || outsideMap
         then model
-        else { model | towers <- (Tower position 1 2) :: model.towers }
+        else { model |
+               towers <- (Tower position 1 2) :: model.towers,
+               money <- model.money - towerCost
+             }
+
+    Reset ->
+      initialModel
 
     Tick time ->
       case model.state of
         Play ->
           let
-            updatedCreeps = List.filterMap (updateCreep model.map) model.creeps
-            escapedCreepCount = List.length model.creeps - List.length updatedCreeps
-            projectiles = List.filterMap (projectile updatedCreeps) (Debug.watch "towers" model.towers)
+            movedCreeps = List.filterMap (updateCreep model.map) model.creeps
+            projectiles = List.filterMap (projectile movedCreeps) (Debug.watch "towers" model.towers)
+            updatedCreeps = creepsAfterProjectiles projectiles movedCreeps
+            escapedCreepCount = List.length model.creeps - List.length movedCreeps
+            killedCreepCount = List.length movedCreeps - List.length updatedCreeps
             newLives = Debug.watch "lives" (model.lives - escapedCreepCount)
+            remainingCreeps = List.length model.creeps
           in
             if newLives > 0
             then
-              { model |
-                creeps <- Debug.watch "creeps" (creepsAfterProjectiles projectiles updatedCreeps),
-                projectiles <- Debug.watch "projectiles" projectiles,
-                lives <- newLives
-              }
+              if remainingCreeps > 0
+              then
+                { model |
+                  creeps <- Debug.watch "creeps" updatedCreeps,
+                  projectiles <- Debug.watch "projectiles" projectiles,
+                  lives <- newLives,
+                  money <- model.money + killedCreepCount * 10
+                }
+              else
+                { model | projectiles <- [], outcome <- Just Won }
             else
-              { model | lives <- 0 }
+              { model | lives <- 0, outcome <- Just Lost }
         Pause ->
           model
 
@@ -275,14 +304,17 @@ view address model (width, height) =
                |> Collage.group
                |> Collage.move ((toFloat -mapSize/2) + tileSize, (toFloat mapSize/2) - tileSize)
   in
-    [
-      Collage.collage mapSize mapSize [graphics],
+    Element.flow Element.right [
+      Element.layers [
+        Collage.collage mapSize mapSize [graphics],
+        Element.container mapSize mapSize Element.middle (wonOrLostView model.outcome)
+      ],
       Element.flow Element.down [
-        Element.container 150 75 Element.midBottom (controlsView address model.state),
-        Element.container 150 50 Element.middle (Element.centered (Text.fromString ("♥ " ++ (toString model.lives))))
+        Element.container 150 110 Element.midBottom <| Element.flow Element.down (controlsView address model.state),
+        Element.container 150 50 Element.middle (Element.centered (Text.fromString ("♥ " ++ (toString model.lives)))),
+        Element.container 150 50 Element.middle (Element.centered (Text.fromString ("$ " ++ (toString model.money))))
       ]
     ]
-    |> Element.flow Element.right
 
 projectileView : Projectile -> Form
 projectileView projectile =
@@ -296,11 +328,12 @@ projectileView projectile =
 towerView : Tower -> Form
 towerView tower =
   let
+    lineStyle = Collage.dotted Color.charcoal
     base = Collage.circle (tileSize / 4)
            |> Collage.filled Color.darkGray
            |> Collage.move (translate tower.position)
     halo = Collage.circle (tileSize * (toFloat tower.radius + 0.5))
-           |> Collage.outlined Collage.defaultLine
+           |> Collage.outlined { lineStyle | width <- 1.5 }
            |> Collage.move (translate tower.position)
   in
     Collage.group [base, halo]
@@ -316,16 +349,17 @@ creepView creep =
       |> Collage.move (translate creep.position)
       |> Just
 
-controlsView : Signal.Address Action -> State -> Element.Element
+controlsView : Signal.Address Action -> State -> List Element.Element
 controlsView address state =
   let
-    element = case state of
-                Play ->
-                  Input.button (Signal.message address (StateChange Pause)) "Pause"
-                Pause ->
-                  Input.button (Signal.message address (StateChange Play)) "Play"
+    play_or_pause = case state of
+                      Play ->
+                        Input.button (Signal.message address (StateChange Pause)) "Pause"
+                      Pause ->
+                        Input.button (Signal.message address (StateChange Play)) "Play"
+    reset = Input.button (Signal.message address Reset) "Play Again"
   in
-    element
+    [play_or_pause, reset]
 
 mapView : Map -> Form
 mapView map =
@@ -345,14 +379,30 @@ tileView position tile =
     color = case tile of
       Grass -> Color.darkGreen
       Road  -> Color.brown
-    background = Collage.rect tileSize tileSize
-                 |> Collage.filled color
-    label = Collage.text
-            <| Text.fromString
-            <| "(" ++ (toString <| fst position) ++ "," ++ (toString <| snd position) ++ ")"
   in
-    Collage.group [background] -- , label]
+    Collage.rect tileSize tileSize
+    |> Collage.filled color
     |> Collage.move (translate position)
+
+wonOrLostView : Maybe Outcome -> Element.Element
+wonOrLostView maybeOutcome =
+  let
+    message outcome = case outcome of
+                        Won  -> "YOU WON!"
+                        Lost -> "GAME OVER"
+    color outcome = case outcome of
+                      Won  -> Color.lightGreen
+                      Lost -> Color.lightRed
+  in
+    case maybeOutcome of
+      Just outcome ->
+        Text.fromString (message outcome)
+        |> Text.bold
+        |> Text.height (tileSize * 1.5)
+        |> Text.color (color outcome)
+        |> Element.centered
+      Nothing ->
+        Element.empty
 
 translate : Position -> (Float, Float)
 translate (x, y) =

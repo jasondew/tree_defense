@@ -106,7 +106,7 @@ defaultCreeps =
 
 initialModel : Model
 initialModel =
-  Model Pause Nothing defaultMap defaultCreeps [] [] 10 150
+  Model Pause Nothing defaultMap defaultCreeps [] [] 10 200
 
 model : Signal Model
 model =
@@ -137,9 +137,9 @@ update action model =
         towerCost = 50
         cantAfford = towerCost > model.money
         alreadyExists = List.any (\tower -> tower.position == position) model.towers
-        outsideMap = List.any (\x -> x >= Array.length model.map) [fst position, snd position]
+        onGrass = tileAt model.map position == Just Grass
       in
-        if cantAfford || alreadyExists || outsideMap
+        if cantAfford || alreadyExists || not onGrass
         then model
         else { model |
                towers <- (Tower position 1 2) :: model.towers,

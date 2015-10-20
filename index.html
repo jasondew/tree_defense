@@ -8974,18 +8974,19 @@ Elm.TreeDefense.make = function (_elm) {
    var tileView = F2(function (position,
    tile) {
       return function () {
-         var color = function () {
+         var imageName = function () {
             switch (tile.ctor)
             {case "Grass":
-               return $Color.darkGreen;
+               return "assets/grass.png";
                case "Road":
-               return $Color.brown;}
+               return "assets/road.png";}
             _U.badCase($moduleName,
             "between lines 379 and 382");
          }();
-         return $Graphics$Collage.move(translate(position))($Graphics$Collage.filled(color)(A2($Graphics$Collage.rect,
+         return $Graphics$Collage.move(translate(position))($Graphics$Collage.toForm(A3($Graphics$Element.image,
          tileSize,
-         tileSize)));
+         tileSize,
+         imageName)));
       }();
    });
    var columnView = function (_v13) {

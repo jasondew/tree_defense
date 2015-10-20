@@ -376,12 +376,12 @@ columnView (y, column) =
 tileView : Position -> Tile -> Form
 tileView position tile =
   let
-    color = case tile of
-      Grass -> Color.darkGreen
-      Road  -> Color.brown
+    imageName = case tile of
+      Grass -> "assets/grass.png"
+      Road  -> "assets/road.png"
   in
-    Collage.rect tileSize tileSize
-    |> Collage.filled color
+    Element.image tileSize tileSize imageName
+    |> Collage.toForm
     |> Collage.move (translate position)
 
 wonOrLostView : Maybe Outcome -> Element.Element
@@ -415,5 +415,5 @@ inverseTranslate (x, y) =
     truncate ((toFloat y - tileSize / 2) / tileSize)
   )
 
-tileSize : Float
+tileSize : number
 tileSize = 60

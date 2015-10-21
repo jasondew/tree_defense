@@ -10,6 +10,7 @@ import Text
 import Window
 import Debug
 import Mouse
+import Touch
 
 main : Signal Element.Element
 main =
@@ -285,9 +286,18 @@ mouseClicks =
   |> Signal.map inverseTranslate
   |> Signal.map Click
 
+touches : Signal Action
+touches =
+  let
+    touchesToClick touches =
+      List.head touches
+      |> Maybe.map (\touch -> Click (touch.x, touch.y))
+  in
+    Signal.filterMap touchesToClick NoOp Touch.touches
+
 inputs : Signal Action
 inputs =
-  Signal.mergeMany [actions.signal, clockTicks, mouseClicks]
+  Signal.mergeMany [actions.signal, clockTicks, mouseClicks, touches]
 
 
 -- VIEW

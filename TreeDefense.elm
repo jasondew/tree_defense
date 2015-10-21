@@ -288,12 +288,7 @@ mouseClicks =
 
 touches : Signal Action
 touches =
-  let
-    touchesToClick touches =
-      List.head touches
-      |> Maybe.map (\touch -> Click (touch.x, touch.y))
-  in
-    Signal.filterMap touchesToClick NoOp Touch.touches
+  Signal.map (\touch -> Click (touch.x, touch.y)) Touch.taps
 
 inputs : Signal Action
 inputs =

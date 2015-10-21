@@ -9136,7 +9136,7 @@ Elm.TreeDefense.make = function (_elm) {
                    ,_0: $Basics.truncate(($Basics.toFloat(_v0._0) - tileSize / 2) / tileSize)
                    ,_1: $Basics.truncate(($Basics.toFloat(_v0._1) - tileSize / 2) / tileSize)};}
          _U.badCase($moduleName,
-         "between lines 424 and 425");
+         "between lines 419 and 420");
       }();
    };
    var translate = function (_v4) {
@@ -9147,7 +9147,7 @@ Elm.TreeDefense.make = function (_elm) {
                    ,_0: $Basics.toFloat(_v4._0) * tileSize
                    ,_1: $Basics.toFloat(0 - _v4._1) * tileSize};}
          _U.badCase($moduleName,
-         "on line 419, column 4 to 47");
+         "on line 414, column 4 to 47");
       }();
    };
    var wonOrLostView = function (maybeOutcome) {
@@ -9160,7 +9160,7 @@ Elm.TreeDefense.make = function (_elm) {
                   case "Won":
                   return $Color.lightGreen;}
                _U.badCase($moduleName,
-               "between lines 403 and 406");
+               "between lines 398 and 401");
             }();
          };
          var message = function (outcome) {
@@ -9170,7 +9170,7 @@ Elm.TreeDefense.make = function (_elm) {
                   return "GAME OVER";
                   case "Won": return "YOU WON!";}
                _U.badCase($moduleName,
-               "between lines 400 and 403");
+               "between lines 395 and 398");
             }();
          };
          return function () {
@@ -9180,7 +9180,7 @@ Elm.TreeDefense.make = function (_elm) {
                case "Nothing":
                return $Graphics$Element.empty;}
             _U.badCase($moduleName,
-            "between lines 407 and 415");
+            "between lines 402 and 410");
          }();
       }();
    };
@@ -9194,7 +9194,7 @@ Elm.TreeDefense.make = function (_elm) {
                case "Road":
                return "assets/road.png";}
             _U.badCase($moduleName,
-            "between lines 389 and 392");
+            "between lines 384 and 387");
          }();
          return $Graphics$Collage.move(translate(position))($Graphics$Collage.toForm(A3($Graphics$Element.image,
          tileSize,
@@ -9216,11 +9216,11 @@ Elm.TreeDefense.make = function (_elm) {
                          ,_1: _v13._0},
                          _v17._1);}
                     _U.badCase($moduleName,
-                    "on line 384, column 30 to 50");
+                    "on line 379, column 30 to 50");
                  }();
               })($Array.toIndexedList(_v13._1));}
          _U.badCase($moduleName,
-         "between lines 383 and 384");
+         "between lines 378 and 379");
       }();
    };
    var mapView = function (map) {
@@ -9235,7 +9235,7 @@ Elm.TreeDefense.make = function (_elm) {
             case "Nothing":
             return $Maybe.Just($Graphics$Collage.move(translate(creep.position))($Graphics$Collage.filled(creep.color)($Graphics$Collage.circle(tileSize / 4))));}
          _U.badCase($moduleName,
-         "between lines 353 and 360");
+         "between lines 348 and 355");
       }();
    };
    var towerView = function (tower) {
@@ -9347,25 +9347,19 @@ Elm.TreeDefense.make = function (_elm) {
    var mouseClicks = $Signal.map(Click)($Signal.map(inverseTranslate)(A2($Signal.sampleOn,
    $Mouse.clicks,
    $Mouse.position)));
+   var touches = A2($Signal.map,
+   function (touch) {
+      return Click({ctor: "_Tuple2"
+                   ,_0: touch.x
+                   ,_1: touch.y});
+   },
+   $Touch.taps);
    var StateChange = function (a) {
       return {ctor: "StateChange"
              ,_0: a};
    };
    var NoOp = {ctor: "NoOp"};
    var actions = $Signal.mailbox(NoOp);
-   var touches = function () {
-      var touchesToClick = function (touches) {
-         return $Maybe.map(function (touch) {
-            return Click({ctor: "_Tuple2"
-                         ,_0: touch.x
-                         ,_1: touch.y});
-         })($List.head(touches));
-      };
-      return A3($Signal.filterMap,
-      touchesToClick,
-      NoOp,
-      $Touch.touches);
-   }();
    var inputs = $Signal.mergeMany(_L.fromArray([actions.signal
                                                ,clockTicks
                                                ,mouseClicks
@@ -9731,7 +9725,7 @@ Elm.TreeDefense.make = function (_elm) {
                  StateChange(Pause)),
                  "Pause");}
             _U.badCase($moduleName,
-            "between lines 365 and 370");
+            "between lines 360 and 365");
          }();
          return _L.fromArray([play_or_pause
                              ,reset]);
@@ -9791,7 +9785,7 @@ Elm.TreeDefense.make = function (_elm) {
                                            $Basics.toString(model.money)))))]))]));
               }();}
          _U.badCase($moduleName,
-         "between lines 308 and 327");
+         "between lines 303 and 322");
       }();
    });
    var Model = F8(function (a,

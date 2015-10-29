@@ -103,7 +103,8 @@ defaultCreeps =
     Creep (0, 3) Nothing (Just 48) Color.lightBlue 10,
     Creep (0, 3) Nothing (Just 49) Color.lightBlue 10,
     Creep (0, 3) Nothing (Just 50) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 60) Color.darkRed 30
+    Creep (0, 3) Nothing (Just 60) Color.darkRed 30,
+    Creep (0, 3) Nothing (Just 70) Color.darkPurple 50
   ]
 
 initialModel : Model
@@ -294,11 +295,11 @@ actions =
 
 clockTicks : Signal Action
 clockTicks =
-  Signal.map Tick <| Time.fps 30
+  Signal.map Tick <| Time.fps framesPerSecond
 
 creepTicks : Signal Action
 creepTicks =
-  Signal.map CreepTick <| Time.fps 5
+  Signal.map CreepTick <| Time.fps creepVelocity
 
 mouseClicks : Signal Action
 mouseClicks =
@@ -345,12 +346,12 @@ projectileView : Projectile -> Form
 projectileView projectile =
   let
     percentage : Float
-    percentage = projectile.position / 6
+    percentage = projectile.position / (60 / 5)
     (from_x, from_y) = projectile.tower.position
     (to_x, to_y) = projectile.creep.position
     current = (ease from_x to_x percentage, ease from_y to_y percentage)
   in
-    Element.image tileSize tileSize "assets/projectile.png"
+    Element.image (round (tileSize / 4)) (round (tileSize / 4)) "assets/projectile.png"
     |> Collage.toForm
     |> Collage.move (translateFloat current)
 
@@ -456,5 +457,15 @@ inverseTranslate (x, y) =
     truncate ((toFloat y - tileSize / 2) / tileSize)
   )
 
+
+-- CONSTANTS
+
+
 tileSize : number
-tileSize = 60
+tileSize = 75
+
+framesPerSecond : number
+framesPerSecond = 60
+
+creepVelocity : number
+creepVelocity = 5

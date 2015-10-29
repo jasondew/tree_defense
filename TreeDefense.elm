@@ -57,7 +57,8 @@ type alias Tower = {
 
 type alias Projectile = {
   tower: Tower,
-  creep: Creep
+  creep: Creep,
+  position: Float
 }
 
 type alias Position = (Int, Int)
@@ -122,6 +123,7 @@ type Action =
   StateChange State |
   Click Position |
   Reset |
+  CreepTick Time |
   Tick Time
 
 update : Action -> Model -> Model
@@ -150,7 +152,7 @@ update action model =
     Reset ->
       initialModel
 
-    Tick time ->
+    CreepTick time ->
       case model.state of
         Play ->
           let
@@ -179,6 +181,16 @@ update action model =
         Pause ->
           model
 
+    Tick time ->
+      case model.state of
+        Play ->
+          let
+            updatedProjectiles = Debug.watch "projectiles" <| List.map updateProjectile model.projectiles
+          in
+            { model | projectiles <- updatedProjectiles }
+        Pause ->
+          model
+
 creepsAfterProjectiles : List Projectile -> List Creep -> List Creep
 creepsAfterProjectiles projectiles creeps =
   List.filterMap (creepAfterProjectiles projectiles) creeps
@@ -203,7 +215,7 @@ projectile creeps tower =
     creepsInRange = List.filter (inRange tower) creeps
   in
     List.head creepsInRange
-    |> Maybe.map (Projectile tower)
+    |> Maybe.map (\creep -> Projectile tower creep 0)
 
 updateCreep : Map -> Creep -> Maybe Creep
 updateCreep map creep =
@@ -219,6 +231,10 @@ updateCreep map creep =
                }
         Nothing ->
           Nothing
+
+updateProjectile : Projectile -> Projectile
+updateProjectile projectile =
+  { projectile | position <- projectile.position + 1 }
 
 inBounds : Map -> Position -> Bool
 inBounds map (x, y) =
@@ -278,7 +294,11 @@ actions =
 
 clockTicks : Signal Action
 clockTicks =
-  Signal.map Tick <| Time.fps 5
+  Signal.map Tick <| Time.fps 30
+
+creepTicks : Signal Action
+creepTicks =
+  Signal.map CreepTick <| Time.fps 5
 
 mouseClicks : Signal Action
 mouseClicks =
@@ -292,7 +312,7 @@ touches =
 
 inputs : Signal Action
 inputs =
-  Signal.mergeMany [actions.signal, clockTicks, mouseClicks, touches]
+  Signal.mergeMany [actions.signal, creepTicks, clockTicks, mouseClicks, touches]
 
 
 -- VIEW
@@ -324,24 +344,28 @@ view address model (width, height) =
 projectileView : Projectile -> Form
 projectileView projectile =
   let
-    lineStyle = Collage.defaultLine
+    percentage : Float
+    percentage = projectile.position / 6
+    (from_x, from_y) = projectile.tower.position
+    (to_x, to_y) = projectile.creep.position
+    current = (ease from_x to_x percentage, ease from_y to_y percentage)
   in
-    Collage.segment (translate projectile.tower.position)
-                    (translate projectile.creep.position)
-    |> Collage.traced lineStyle
+    Element.image tileSize tileSize "assets/projectile.png"
+    |> Collage.toForm
+    |> Collage.move (translateFloat current)
 
 towerView : Tower -> Form
 towerView tower =
   let
+    image = Element.image tileSize tileSize "assets/tree-elm-grown.png"
+            |> Collage.toForm
+            |> Collage.move (translate tower.position)
     lineStyle = Collage.dotted Color.charcoal
-    base = Collage.circle (tileSize / 4)
-           |> Collage.filled Color.darkGray
-           |> Collage.move (translate tower.position)
     halo = Collage.circle (tileSize * (toFloat tower.radius + 0.5))
            |> Collage.outlined { lineStyle | width <- 1.5 }
            |> Collage.move (translate tower.position)
   in
-    Collage.group [base, halo]
+    Collage.group [image, halo]
 
 creepView : Creep -> Maybe Form
 creepView creep =
@@ -409,9 +433,21 @@ wonOrLostView maybeOutcome =
       Nothing ->
         Element.empty
 
+ease : Int -> Int -> Float -> Float
+ease fromInt toInt percentage =
+  let
+    from = toFloat fromInt
+    to   = toFloat toInt
+  in
+    from + (to - from) * percentage
+
 translate : Position -> (Float, Float)
 translate (x, y) =
   (toFloat x * tileSize, toFloat -y * tileSize)
+
+translateFloat : (Float, Float) -> (Float, Float)
+translateFloat (x, y) =
+  (x * tileSize, -y * tileSize)
 
 inverseTranslate : (Int, Int) -> Position
 inverseTranslate (x, y) =

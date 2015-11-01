@@ -1,6 +1,6 @@
 module TreeDefense where
 
-import Graphics.Element as Element
+import Graphics.Element as Element exposing (Element)
 import Graphics.Collage as Collage exposing (Form, Shape)
 import Graphics.Input as Input
 import Color exposing (Color)
@@ -12,9 +12,9 @@ import Debug
 import Mouse
 import Touch
 
-main : Signal Element.Element
+main : Signal Element
 main =
-  Signal.map2 (view actions.address) model Window.dimensions
+  Signal.map (view actions.address) model
 
 
 -- MODEL
@@ -319,28 +319,27 @@ inputs =
 -- VIEW
 
 
-view : Signal.Address Action -> Model -> (Int, Int) -> Element.Element
-view address model (width, height) =
-  let
-    mapSize = (round tileSize) * (Array.length model.map)
-    graphics = List.filterMap creepView model.creeps
-               |> List.append (List.map towerView model.towers)
-               |> List.append (List.map projectileView model.projectiles)
-               |> List.append [mapView model.map]
-               |> Collage.group
-               |> Collage.move ((toFloat -mapSize/2) + tileSize, (toFloat mapSize/2) - tileSize)
-  in
-    Element.flow Element.right [
-      Element.layers [
-        Collage.collage mapSize mapSize [graphics],
-        Element.container mapSize mapSize Element.middle (wonOrLostView model.outcome)
-      ],
-      Element.flow Element.down [
-        Element.container 150 110 Element.midBottom <| Element.flow Element.down (controlsView address model.state),
-        Element.container 150 50 Element.middle (Element.centered (Text.fromString ("♥ " ++ (toString model.lives)))),
-        Element.container 150 50 Element.middle (Element.centered (Text.fromString ("$ " ++ (toString model.money))))
-      ]
+view : Signal.Address Action -> Model -> Element
+view address model =
+  Element.flow Element.right [
+    Element.layers [
+      Element.container mapSize mapSize Element.topLeft (gameView model)
+    , Element.container mapSize mapSize Element.middle (wonOrLostView model.outcome)
     ]
+  , Element.flow Element.down [
+      Element.container 150 110 Element.midBottom <| Element.flow Element.down (controlsView address model.state)
+    , Element.container 150 50 Element.middle (Element.centered (Text.fromString ("♥ " ++ (toString model.lives))))
+    , Element.container 150 50 Element.middle (Element.centered (Text.fromString ("$ " ++ (toString model.money))))
+    ]
+  ]
+
+gameView : Model -> Element
+gameView model =
+  List.filterMap creepView model.creeps
+    |> List.append (List.map towerView model.towers)
+    |> List.append (List.map projectileView model.projectiles)
+    |> List.append [mapView model.map]
+    |> Collage.collage mapSize (Debug.watch "mapSize" mapSize)
 
 projectileView : Projectile -> Form
 projectileView projectile =
@@ -358,7 +357,7 @@ projectileView projectile =
 towerView : Tower -> Form
 towerView tower =
   let
-    image = Element.image tileSize tileSize "assets/tree-elm-grown.png"
+    image = Element.image (round tileSize) (round tileSize) "assets/tree-elm-grown.png"
             |> Collage.toForm
             |> Collage.move (translate tower.position)
     lineStyle = Collage.dotted Color.charcoal
@@ -379,7 +378,7 @@ creepView creep =
       |> Collage.move (translate creep.position)
       |> Just
 
-controlsView : Signal.Address Action -> State -> List Element.Element
+controlsView : Signal.Address Action -> State -> List Element
 controlsView address state =
   let
     play_or_pause = case state of
@@ -410,11 +409,11 @@ tileView position tile =
       Grass -> "assets/grass.png"
       Road  -> "assets/road.png"
   in
-    Element.image tileSize tileSize imageName
+    Element.image (round tileSize) (round tileSize) imageName
     |> Collage.toForm
     |> Collage.move (translate position)
 
-wonOrLostView : Maybe Outcome -> Element.Element
+wonOrLostView : Maybe Outcome -> Element
 wonOrLostView maybeOutcome =
   let
     message outcome = case outcome of
@@ -444,25 +443,34 @@ ease fromInt toInt percentage =
 
 translate : Position -> (Float, Float)
 translate (x, y) =
-  (toFloat x * tileSize, toFloat -y * tileSize)
+  translateFloat (toFloat x, toFloat y)
 
 translateFloat : (Float, Float) -> (Float, Float)
 translateFloat (x, y) =
-  (x * tileSize, -y * tileSize)
+  (
+     x * tileSize - mapSize / 2.0 + tileSize / 2.0
+  , -y * tileSize + mapSize / 2.0 - tileSize / 2.0
+  )
 
 inverseTranslate : (Int, Int) -> Position
 inverseTranslate (x, y) =
   (
-    truncate ((toFloat x - tileSize / 2) / tileSize),
-    truncate ((toFloat y - tileSize / 2) / tileSize)
+    truncate (toFloat x / tileSize)
+  , truncate (toFloat y / tileSize)
   )
 
 
 -- CONSTANTS
 
 
+mapSize : number
+mapSize = 600
+
+gridSize : number
+gridSize = 10
+
 tileSize : number
-tileSize = 75
+tileSize = mapSize / gridSize
 
 framesPerSecond : number
 framesPerSecond = 60

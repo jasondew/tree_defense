@@ -1,5 +1,9 @@
 module TreeDefense where
 
+import Models exposing (..)
+import Levels exposing (levelOne)
+import Maps exposing (defaultMap)
+
 import Graphics.Element as Element exposing (Element)
 import Graphics.Collage as Collage exposing (Form, Shape)
 import Graphics.Input as Input
@@ -20,96 +24,9 @@ main =
 -- MODEL
 
 
-type alias Model = {
-  state: State,
-  outcome: Maybe Outcome,
-  map: Map,
-  creeps: List Creep,
-  towers: List Tower,
-  projectiles: List Projectile,
-  lives: Int,
-  money: Int
-}
-
-type State =
-  Play |
-  Pause
-
-type Outcome =
-  Won |
-  Lost
-
-type alias Map = Array (Array Tile)
-
-type alias Creep = {
-  position: Position,
-  previousPosition: Maybe Position,
-  delay: Maybe Int,
-  color: Color,
-  health: Int
-}
-
-type alias Tower = {
-  position: Position,
-  radius: Int,
-  damage: Int
-}
-
-type alias Projectile = {
-  tower: Tower,
-  creep: Creep,
-  position: Float
-}
-
-type alias Position = (Int, Int)
-
-type Tile =
-  Grass |
-  Road
-
-defaultMap : Map
-defaultMap =
-  Array.fromList [
-    Array.fromList [Grass, Grass, Grass, Grass, Grass, Grass, Grass, Grass, Grass, Grass],
-    Array.fromList [Grass, Grass, Grass, Grass,  Road,  Road,  Road, Grass, Grass, Grass],
-    Array.fromList [Grass, Grass, Grass, Grass,  Road, Grass,  Road, Grass, Grass, Grass],
-    Array.fromList [Road,   Road, Grass, Grass,  Road, Grass,  Road, Grass, Grass, Grass],
-    Array.fromList [Grass,  Road, Grass, Grass,  Road, Grass,  Road, Grass, Grass, Grass],
-    Array.fromList [Grass,  Road, Grass, Grass,  Road, Grass,  Road,  Road,  Road,  Road],
-    Array.fromList [Grass,  Road, Grass, Grass,  Road, Grass, Grass, Grass, Grass, Grass],
-    Array.fromList [Grass,  Road,  Road,  Road,  Road, Grass, Grass, Grass, Grass, Grass],
-    Array.fromList [Grass, Grass, Grass, Grass, Grass, Grass, Grass, Grass, Grass, Grass],
-    Array.fromList [Grass, Grass, Grass, Grass, Grass, Grass, Grass, Grass, Grass, Grass]
-  ]
-
-defaultCreeps : List Creep
-defaultCreeps =
-  [
-    Creep (0, 3) Nothing Nothing   Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just  1) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just  2) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just  3) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 15) Color.red 20,
-    Creep (0, 3) Nothing (Just 20) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 21) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 22) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 23) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 24) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 25) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 35) Color.red 20,
-    Creep (0, 3) Nothing (Just 45) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 46) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 47) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 48) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 49) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 50) Color.lightBlue 10,
-    Creep (0, 3) Nothing (Just 60) Color.darkRed 30,
-    Creep (0, 3) Nothing (Just 70) Color.darkPurple 50
-  ]
-
 initialModel : Model
 initialModel =
-  Model Pause Nothing defaultMap defaultCreeps [] [] 10 200
+  Model Pause Nothing defaultMap levelOne [] [] 10 150
 
 model : Signal Model
 model =
@@ -220,18 +137,17 @@ projectile creeps tower =
 
 updateCreep : Map -> Creep -> Maybe Creep
 updateCreep map creep =
-  case creep.delay of
-    Just delay ->
-      Just { creep | delay <- if delay == 0 then Nothing else Just (delay - 1) }
-    Nothing ->
-      case nextPosition map creep of
-        Just newPosition ->
-          Just { creep |
-                 position <- newPosition,
-                 previousPosition <- Just creep.position
-               }
-        Nothing ->
-          Nothing
+  if creep.delay == 0 then
+    case nextPosition map creep of
+      Just newPosition ->
+        Just { creep |
+               position <- Just newPosition,
+               previousPosition <- creep.position
+             }
+      Nothing ->
+        Nothing
+  else
+    Just { creep | delay <- creep.delay - 1 }
 
 updateProjectile : Projectile -> Projectile
 updateProjectile projectile =
@@ -249,7 +165,11 @@ inBounds map (x, y) =
 
 inRange : Tower -> Creep -> Bool
 inRange tower creep =
-  distance tower.position creep.position <= tower.radius
+  case creep.position of
+    Just position ->
+      distance tower.position position <= tower.radius
+    Nothing ->
+      False
 
 distance : Position -> Position -> Int
 distance (x1, y1) (x2, y2) =
@@ -258,18 +178,33 @@ distance (x1, y1) (x2, y2) =
   |> sqrt
   |> round
 
+initialPosition : Map -> Position
+initialPosition map =
+  let
+    column = Array.map (\row -> Maybe.withDefault Grass <| Array.get 0 row) map
+    row = Array.toIndexedList column
+          |> List.filter (\(index, tile) -> tile == Road)
+          |> List.head
+          |> Maybe.withDefault (0, Road)
+          |> fst
+  in
+    (0, row)
+
 nextPosition : Map -> Creep -> Maybe Position
 nextPosition map creep =
-  let
-    (x, y) = creep.position
-    up     = ( x,  y+1)
-    down   = ( x,  y-1)
-    right  = (x+1,  y )
-  in
-    List.map (\position -> (position, tileAt map position)) [up, down, right]
-    |> List.filter (traversable creep.previousPosition)
-    |> List.map fst
-    |> List.head                    -- TODO: pick one at random
+  case creep.position of
+    Just (x, y) ->
+      let
+        up     = ( x,  y+1)
+        down   = ( x,  y-1)
+        right  = (x+1,  y )
+      in
+        List.map (\position -> (position, tileAt map position)) [up, down, right]
+        |> List.filter (traversable creep.previousPosition)
+        |> List.map fst
+        |> List.head                    -- TODO: pick one at random
+    Nothing ->
+      Just (initialPosition map)
 
 traversable : Maybe Position -> (Position, Maybe Tile) -> Bool
 traversable maybePreviousPosition (position, maybeTile) =
@@ -326,10 +261,13 @@ view address model =
       Element.container mapSize mapSize Element.topLeft (gameView model)
     , Element.container mapSize mapSize Element.middle (wonOrLostView model.outcome)
     ]
+  , Element.spacer 10 mapSize
   , Element.flow Element.down [
-      Element.container 150 110 Element.midBottom <| Element.flow Element.down (controlsView address model.state)
-    , Element.container 150 50 Element.middle (Element.centered (Text.fromString ("♥ " ++ (toString model.lives))))
-    , Element.container 150 50 Element.middle (Element.centered (Text.fromString ("$ " ++ (toString model.money))))
+      Element.container panelWidth              50 Element.middle  titleView
+    , Element.container panelWidth              50 Element.middle  instructionsView
+    , Element.container panelWidth             100 Element.middle  (statusView model)
+    , Element.container panelWidth (mapSize - 250) Element.topLeft legendView
+    , Element.container panelWidth              50 Element.middle  (controlsView address model.state)
     ]
   ]
 
@@ -347,7 +285,7 @@ projectileView projectile =
     percentage : Float
     percentage = projectile.position / (60 / 5)
     (from_x, from_y) = projectile.tower.position
-    (to_x, to_y) = projectile.creep.position
+    (to_x, to_y) = Maybe.withDefault (0, 0) projectile.creep.position
     current = (ease from_x to_x percentage, ease from_y to_y percentage)
   in
     Element.image (round (tileSize / 4)) (round (tileSize / 4)) "assets/projectile.png"
@@ -369,16 +307,39 @@ towerView tower =
 
 creepView : Creep -> Maybe Form
 creepView creep =
-  case creep.delay of
-    Just _ ->
-      Nothing
-    Nothing ->
-      Collage.circle (tileSize / 4)
-      |> Collage.filled creep.color
-      |> Collage.move (translate creep.position)
-      |> Just
+  if creep.delay == 0 then
+    case creep.position of
+      Just position ->
+        Collage.circle (tileSize / 4)
+        |> Collage.filled creep.color
+        |> Collage.move (translate position)
+        |> Just
+      Nothing ->
+        Nothing
+  else
+    Nothing
 
-controlsView : Signal.Address Action -> State -> List Element
+titleView : Element
+titleView =
+  Text.fromString "Tree Defense"
+  |> Text.bold
+  |> Text.height 30
+  |> Element.centered
+
+instructionsView : Element
+instructionsView =
+  let
+    format string = Text.fromString string
+                    |> Text.height 12
+                    |> Element.centered
+                    |> Element.container panelWidth 15 Element.middle
+  in
+    Element.flow Element.down [
+      format "Click to plant trees that defend"
+    , format "against the invading ant horde!"
+    ]
+
+controlsView : Signal.Address Action -> State -> Element
 controlsView address state =
   let
     play_or_pause = case state of
@@ -388,7 +349,62 @@ controlsView address state =
                         Input.button (Signal.message address (StateChange Play)) "Play"
     reset = Input.button (Signal.message address Reset) "Play Again"
   in
-    [play_or_pause, reset]
+    play_or_pause `Element.beside` reset
+
+statusView : Model -> Element
+statusView model =
+  Text.fromString ("♥" ++ (toString model.lives) ++ "  $" ++ (toString model.money))
+  |> Text.height 25
+  |> Element.centered
+
+legendView : Element
+legendView =
+  let
+    size = tileSize / 3
+           |> round
+    image = Element.image size size
+    creep color = Collage.circle (tileSize / 9)
+                  |> Collage.filled color
+                  |> (flip (::)) []
+                  |> Collage.collage size size
+    header string = Text.fromString string
+                    |> Text.bold
+                    |> Element.centered
+    rule = [Collage.filled Color.black (Collage.rect panelWidth 1)]
+           |> Collage.collage panelWidth 4
+           |> Element.container panelWidth 4 Element.topLeft
+  in
+    Element.flow Element.down [
+      header "Trees"
+    , rule
+    , legendItemView (image "assets/tree-elm-grown.png") "Elm tree" "$50"
+    , Element.spacer panelWidth 40
+    , header "Enemies"
+    , rule
+    , legendItemView (creep Color.black) "Ant" "♥10"
+    , legendItemView (creep Color.red) "Fire Ant" "♥20"
+    , legendItemView (creep Color.darkRed) "Cow Ant" "♥30"
+    ]
+
+legendItemView : Element -> String -> String -> Element
+legendItemView image title cost =
+  let
+    text string = Text.fromString string
+                  |> Text.height (tileSize / 3)
+                  |> Element.centered
+    titleElement = text title
+    costElement = text cost
+    space = panelWidth -
+            Element.widthOf image -
+            Element.widthOf titleElement -
+            Element.widthOf costElement
+  in
+    Element.flow Element.right [
+      image
+    , titleElement
+    , Element.spacer space 10
+    , costElement
+    ]
 
 mapView : Map -> Form
 mapView map =
@@ -465,6 +481,9 @@ inverseTranslate (x, y) =
 
 mapSize : number
 mapSize = 600
+
+panelWidth : number
+panelWidth = 200
 
 gridSize : number
 gridSize = 10

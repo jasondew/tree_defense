@@ -719,6 +719,53 @@ Elm.Color.make = function (_elm) {
                        ,gray: gray
                        ,darkGray: darkGray};
    return _elm.Color.values;
+};Elm.Creeps = Elm.Creeps || {};
+Elm.Creeps.make = function (_elm) {
+   "use strict";
+   _elm.Creeps = _elm.Creeps || {};
+   if (_elm.Creeps.values)
+   return _elm.Creeps.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Creeps",
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Models = Elm.Models.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var cowAnt = function (delay) {
+      return A5($Models.Creep,
+      $Maybe.Nothing,
+      $Maybe.Nothing,
+      delay,
+      $Color.darkRed,
+      30);
+   };
+   var fireAnt = function (delay) {
+      return A5($Models.Creep,
+      $Maybe.Nothing,
+      $Maybe.Nothing,
+      delay,
+      $Color.red,
+      20);
+   };
+   var ant = function (delay) {
+      return A5($Models.Creep,
+      $Maybe.Nothing,
+      $Maybe.Nothing,
+      delay,
+      $Color.black,
+      10);
+   };
+   _elm.Creeps.values = {_op: _op
+                        ,ant: ant
+                        ,fireAnt: fireAnt
+                        ,cowAnt: cowAnt};
+   return _elm.Creeps.values;
 };Elm.Debug = Elm.Debug || {};
 Elm.Debug.make = function (_elm) {
    "use strict";
@@ -1660,6 +1707,105 @@ Elm.Graphics.Input.make = function (_elm) {
                                 ,hoverable: hoverable
                                 ,clickable: clickable};
    return _elm.Graphics.Input.values;
+};Elm.Levels = Elm.Levels || {};
+Elm.Levels.make = function (_elm) {
+   "use strict";
+   _elm.Levels = _elm.Levels || {};
+   if (_elm.Levels.values)
+   return _elm.Levels.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Levels",
+   $Basics = Elm.Basics.make(_elm),
+   $Creeps = Elm.Creeps.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Models = Elm.Models.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var level = function (list) {
+      return $List.filterMap($Basics.identity)($List.indexedMap(F2(function (delay,
+      maybeCreep) {
+         return A2($Maybe.map,
+         F2(function (x,y) {
+            return y(x);
+         })(delay),
+         maybeCreep);
+      }))($List.concat($List.map(function (_v0) {
+         return function () {
+            switch (_v0.ctor)
+            {case "_Tuple2":
+               return A2($List.repeat,
+                 _v0._0,
+                 _v0._1);}
+            _U.badCase($moduleName,
+            "on line 33, column 41 to 70");
+         }();
+      })(list))));
+   };
+   var levelOne = level(_L.fromArray([{ctor: "_Tuple2"
+                                      ,_0: 5
+                                      ,_1: $Maybe.Just($Creeps.ant)}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 10
+                                      ,_1: $Maybe.Nothing}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 1
+                                      ,_1: $Maybe.Just($Creeps.fireAnt)}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 10
+                                      ,_1: $Maybe.Nothing}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 7
+                                      ,_1: $Maybe.Just($Creeps.ant)}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 10
+                                      ,_1: $Maybe.Nothing}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 3
+                                      ,_1: $Maybe.Just($Creeps.fireAnt)}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 10
+                                      ,_1: $Maybe.Nothing}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 1
+                                      ,_1: $Maybe.Just($Creeps.cowAnt)}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 10
+                                      ,_1: $Maybe.Nothing}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 10
+                                      ,_1: $Maybe.Just($Creeps.ant)}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 5
+                                      ,_1: $Maybe.Nothing}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 10
+                                      ,_1: $Maybe.Just($Creeps.fireAnt)}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 5
+                                      ,_1: $Maybe.Nothing}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 1
+                                      ,_1: $Maybe.Just($Creeps.cowAnt)}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 5
+                                      ,_1: $Maybe.Nothing}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 2
+                                      ,_1: $Maybe.Just($Creeps.cowAnt)}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 5
+                                      ,_1: $Maybe.Nothing}
+                                     ,{ctor: "_Tuple2"
+                                      ,_0: 3
+                                      ,_1: $Maybe.Just($Creeps.cowAnt)}]));
+   _elm.Levels.values = {_op: _op
+                        ,levelOne: levelOne
+                        ,level: level};
+   return _elm.Levels.values;
 };Elm.List = Elm.List || {};
 Elm.List.make = function (_elm) {
    "use strict";
@@ -2014,6 +2160,127 @@ Elm.List.make = function (_elm) {
                       ,sortBy: sortBy
                       ,sortWith: sortWith};
    return _elm.List.values;
+};Elm.Maps = Elm.Maps || {};
+Elm.Maps.make = function (_elm) {
+   "use strict";
+   _elm.Maps = _elm.Maps || {};
+   if (_elm.Maps.values)
+   return _elm.Maps.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Maps",
+   $Array = Elm.Array.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Models = Elm.Models.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var defaultMap = $Array.fromList(_L.fromArray([$Array.fromList(_L.fromArray([$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass]))
+                                                 ,$Array.fromList(_L.fromArray([$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Road
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass]))
+                                                 ,$Array.fromList(_L.fromArray([$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass]))
+                                                 ,$Array.fromList(_L.fromArray([$Models.Road
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass]))
+                                                 ,$Array.fromList(_L.fromArray([$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass]))
+                                                 ,$Array.fromList(_L.fromArray([$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Road
+                                                                               ,$Models.Road
+                                                                               ,$Models.Road]))
+                                                 ,$Array.fromList(_L.fromArray([$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass]))
+                                                 ,$Array.fromList(_L.fromArray([$Models.Grass
+                                                                               ,$Models.Road
+                                                                               ,$Models.Road
+                                                                               ,$Models.Road
+                                                                               ,$Models.Road
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass]))
+                                                 ,$Array.fromList(_L.fromArray([$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass]))
+                                                 ,$Array.fromList(_L.fromArray([$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass
+                                                                               ,$Models.Grass]))]));
+   _elm.Maps.values = {_op: _op
+                      ,defaultMap: defaultMap};
+   return _elm.Maps.values;
 };Elm.Maybe = Elm.Maybe || {};
 Elm.Maybe.make = function (_elm) {
    "use strict";
@@ -2086,6 +2353,88 @@ Elm.Maybe.make = function (_elm) {
                        ,Just: Just
                        ,Nothing: Nothing};
    return _elm.Maybe.values;
+};Elm.Models = Elm.Models || {};
+Elm.Models.make = function (_elm) {
+   "use strict";
+   _elm.Models = _elm.Models || {};
+   if (_elm.Models.values)
+   return _elm.Models.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Models",
+   $Array = Elm.Array.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var Road = {ctor: "Road"};
+   var Grass = {ctor: "Grass"};
+   var Projectile = F3(function (a,
+   b,
+   c) {
+      return {_: {}
+             ,creep: b
+             ,position: c
+             ,tower: a};
+   });
+   var Tower = F3(function (a,
+   b,
+   c) {
+      return {_: {}
+             ,damage: c
+             ,position: a
+             ,radius: b};
+   });
+   var Creep = F5(function (a,
+   b,
+   c,
+   d,
+   e) {
+      return {_: {}
+             ,color: d
+             ,delay: c
+             ,health: e
+             ,position: a
+             ,previousPosition: b};
+   });
+   var Lost = {ctor: "Lost"};
+   var Won = {ctor: "Won"};
+   var Pause = {ctor: "Pause"};
+   var Play = {ctor: "Play"};
+   var Model = F8(function (a,
+   b,
+   c,
+   d,
+   e,
+   f,
+   g,
+   h) {
+      return {_: {}
+             ,creeps: d
+             ,lives: g
+             ,map: c
+             ,money: h
+             ,outcome: b
+             ,projectiles: f
+             ,state: a
+             ,towers: e};
+   });
+   _elm.Models.values = {_op: _op
+                        ,Model: Model
+                        ,Play: Play
+                        ,Pause: Pause
+                        ,Won: Won
+                        ,Lost: Lost
+                        ,Creep: Creep
+                        ,Tower: Tower
+                        ,Projectile: Projectile
+                        ,Grass: Grass
+                        ,Road: Road};
+   return _elm.Models.values;
 };Elm.Mouse = Elm.Mouse || {};
 Elm.Mouse.make = function (_elm) {
    "use strict";
@@ -8160,74 +8509,6 @@ Elm.Native.Utils.make = function(localRuntime) {
 		badPort: badPort
 	};
 };
-Elm.Native = Elm.Native || {};
-Elm.Native.Window = {};
-Elm.Native.Window.make = function(localRuntime) {
-
-	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Window = localRuntime.Native.Window || {};
-	if (localRuntime.Native.Window.values)
-	{
-		return localRuntime.Native.Window.values;
-	}
-
-	var NS = Elm.Native.Signal.make(localRuntime);
-	var Tuple2 = Elm.Native.Utils.make(localRuntime).Tuple2;
-
-
-	function getWidth()
-	{
-		return localRuntime.node.clientWidth;
-	}
-
-
-	function getHeight()
-	{
-		if (localRuntime.isFullscreen())
-		{
-			return window.innerHeight;
-		}
-		return localRuntime.node.clientHeight;
-	}
-
-
-	var dimensions = NS.input('Window.dimensions', Tuple2(getWidth(), getHeight()));
-
-
-	function resizeIfNeeded()
-	{
-		// Do not trigger event if the dimensions have not changed.
-		// This should be most of the time.
-		var w = getWidth();
-		var h = getHeight();
-		if (dimensions.value._0 === w && dimensions.value._1 === h)
-		{
-			return;
-		}
-
-		setTimeout(function () {
-			// Check again to see if the dimensions have changed.
-			// It is conceivable that the dimensions have changed
-			// again while some other event was being processed.
-			var w = getWidth();
-			var h = getHeight();
-			if (dimensions.value._0 === w && dimensions.value._1 === h)
-			{
-				return;
-			}
-			localRuntime.notify(dimensions.id, Tuple2(w,h));
-		}, 0);
-	}
-
-
-	localRuntime.addListener([dimensions.id], window, 'resize', resizeIfNeeded);
-
-
-	return localRuntime.Native.Window.values = {
-		dimensions: dimensions,
-		resizeIfNeeded: resizeIfNeeded
-	};
-};
 Elm.Result = Elm.Result || {};
 Elm.Result.make = function (_elm) {
    "use strict";
@@ -9118,38 +9399,65 @@ Elm.TreeDefense.make = function (_elm) {
    $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $Graphics$Input = Elm.Graphics.Input.make(_elm),
+   $Levels = Elm.Levels.make(_elm),
    $List = Elm.List.make(_elm),
+   $Maps = Elm.Maps.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Models = Elm.Models.make(_elm),
    $Mouse = Elm.Mouse.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Text = Elm.Text.make(_elm),
    $Time = Elm.Time.make(_elm),
-   $Touch = Elm.Touch.make(_elm),
-   $Window = Elm.Window.make(_elm);
-   var tileSize = 60;
+   $Touch = Elm.Touch.make(_elm);
+   var creepVelocity = 5;
+   var framesPerSecond = 60;
+   var gridSize = 10;
+   var panelWidth = 200;
+   var mapSize = 600;
+   var tileSize = mapSize / gridSize;
    var inverseTranslate = function (_v0) {
       return function () {
          switch (_v0.ctor)
          {case "_Tuple2":
             return {ctor: "_Tuple2"
-                   ,_0: $Basics.truncate(($Basics.toFloat(_v0._0) - tileSize / 2) / tileSize)
-                   ,_1: $Basics.truncate(($Basics.toFloat(_v0._1) - tileSize / 2) / tileSize)};}
+                   ,_0: $Basics.truncate($Basics.toFloat(_v0._0) / tileSize)
+                   ,_1: $Basics.truncate($Basics.toFloat(_v0._1) / tileSize)};}
          _U.badCase($moduleName,
-         "between lines 419 and 420");
+         "between lines 473 and 474");
       }();
    };
-   var translate = function (_v4) {
+   var translateFloat = function (_v4) {
       return function () {
          switch (_v4.ctor)
          {case "_Tuple2":
             return {ctor: "_Tuple2"
-                   ,_0: $Basics.toFloat(_v4._0) * tileSize
-                   ,_1: $Basics.toFloat(0 - _v4._1) * tileSize};}
+                   ,_0: _v4._0 * tileSize - mapSize / 2.0 + tileSize / 2.0
+                   ,_1: (0 - _v4._1) * tileSize + mapSize / 2.0 - tileSize / 2.0};}
          _U.badCase($moduleName,
-         "on line 414, column 4 to 47");
+         "between lines 466 and 467");
       }();
    };
+   var translate = function (_v8) {
+      return function () {
+         switch (_v8.ctor)
+         {case "_Tuple2":
+            return translateFloat({ctor: "_Tuple2"
+                                  ,_0: $Basics.toFloat(_v8._0)
+                                  ,_1: $Basics.toFloat(_v8._1)});}
+         _U.badCase($moduleName,
+         "on line 461, column 3 to 39");
+      }();
+   };
+   var ease = F3(function (fromInt,
+   toInt,
+   percentage) {
+      return function () {
+         var to = $Basics.toFloat(toInt);
+         var from = $Basics.toFloat(fromInt);
+         return from + (to - from) * percentage;
+      }();
+   });
    var wonOrLostView = function (maybeOutcome) {
       return function () {
          var color = function (outcome) {
@@ -9160,7 +9468,7 @@ Elm.TreeDefense.make = function (_elm) {
                   case "Won":
                   return $Color.lightGreen;}
                _U.badCase($moduleName,
-               "between lines 398 and 401");
+               "between lines 437 and 440");
             }();
          };
          var message = function (outcome) {
@@ -9170,7 +9478,7 @@ Elm.TreeDefense.make = function (_elm) {
                   return "GAME OVER";
                   case "Won": return "YOU WON!";}
                _U.badCase($moduleName,
-               "between lines 395 and 398");
+               "between lines 434 and 437");
             }();
          };
          return function () {
@@ -9180,7 +9488,7 @@ Elm.TreeDefense.make = function (_elm) {
                case "Nothing":
                return $Graphics$Element.empty;}
             _U.badCase($moduleName,
-            "between lines 402 and 410");
+            "between lines 441 and 449");
          }();
       }();
    };
@@ -9194,122 +9502,390 @@ Elm.TreeDefense.make = function (_elm) {
                case "Road":
                return "assets/road.png";}
             _U.badCase($moduleName,
-            "between lines 384 and 387");
+            "between lines 423 and 426");
          }();
          return $Graphics$Collage.move(translate(position))($Graphics$Collage.toForm(A3($Graphics$Element.image,
-         tileSize,
-         tileSize,
+         $Basics.round(tileSize),
+         $Basics.round(tileSize),
          imageName)));
       }();
    });
-   var columnView = function (_v13) {
+   var columnView = function (_v17) {
       return function () {
-         switch (_v13.ctor)
+         switch (_v17.ctor)
          {case "_Tuple2":
-            return $List.map(function (_v17) {
+            return $List.map(function (_v21) {
                  return function () {
-                    switch (_v17.ctor)
+                    switch (_v21.ctor)
                     {case "_Tuple2":
                        return A2(tileView,
                          {ctor: "_Tuple2"
-                         ,_0: _v17._0
-                         ,_1: _v13._0},
-                         _v17._1);}
+                         ,_0: _v21._0
+                         ,_1: _v17._0},
+                         _v21._1);}
                     _U.badCase($moduleName,
-                    "on line 379, column 30 to 50");
+                    "on line 418, column 30 to 50");
                  }();
-              })($Array.toIndexedList(_v13._1));}
+              })($Array.toIndexedList(_v17._1));}
          _U.badCase($moduleName,
-         "between lines 378 and 379");
+         "between lines 417 and 418");
       }();
    };
    var mapView = function (map) {
       return $Graphics$Collage.group($List.concat($List.map(columnView)($Array.toIndexedList(map))));
    };
-   var creepView = function (creep) {
+   var legendItemView = F3(function (image,
+   title,
+   cost) {
       return function () {
-         var _v21 = creep.delay;
-         switch (_v21.ctor)
-         {case "Just":
-            return $Maybe.Nothing;
-            case "Nothing":
-            return $Maybe.Just($Graphics$Collage.move(translate(creep.position))($Graphics$Collage.filled(creep.color)($Graphics$Collage.circle(tileSize / 4))));}
-         _U.badCase($moduleName,
-         "between lines 348 and 355");
+         var text = function (string) {
+            return $Graphics$Element.centered($Text.height(tileSize / 3)($Text.fromString(string)));
+         };
+         var titleElement = text(title);
+         var costElement = text(cost);
+         var space = panelWidth - $Graphics$Element.widthOf(image) - $Graphics$Element.widthOf(titleElement) - $Graphics$Element.widthOf(costElement);
+         return A2($Graphics$Element.flow,
+         $Graphics$Element.right,
+         _L.fromArray([image
+                      ,titleElement
+                      ,A2($Graphics$Element.spacer,
+                      space,
+                      10)
+                      ,costElement]));
       }();
+   });
+   var legendView = function () {
+      var rule = A3($Graphics$Element.container,
+      panelWidth,
+      4,
+      $Graphics$Element.topLeft)(A2($Graphics$Collage.collage,
+      panelWidth,
+      4)(_L.fromArray([A2($Graphics$Collage.filled,
+      $Color.black,
+      A2($Graphics$Collage.rect,
+      panelWidth,
+      1))])));
+      var header = function (string) {
+         return $Graphics$Element.centered($Text.bold($Text.fromString(string)));
+      };
+      var size = $Basics.round(tileSize / 3);
+      var image = A2($Graphics$Element.image,
+      size,
+      size);
+      var creep = function (color) {
+         return A2($Graphics$Collage.collage,
+         size,
+         size)(A2($Basics.flip,
+         F2(function (x,y) {
+            return A2($List._op["::"],
+            x,
+            y);
+         }),
+         _L.fromArray([]))($Graphics$Collage.filled(color)($Graphics$Collage.circle(tileSize / 9))));
+      };
+      return A2($Graphics$Element.flow,
+      $Graphics$Element.down,
+      _L.fromArray([header("Trees")
+                   ,rule
+                   ,A3(legendItemView,
+                   image("assets/tree-elm-grown.png"),
+                   "Elm tree",
+                   "$50")
+                   ,A2($Graphics$Element.spacer,
+                   panelWidth,
+                   40)
+                   ,header("Enemies")
+                   ,rule
+                   ,A3(legendItemView,
+                   creep($Color.black),
+                   "Ant",
+                   "♥10")
+                   ,A3(legendItemView,
+                   creep($Color.red),
+                   "Fire Ant",
+                   "♥20")
+                   ,A3(legendItemView,
+                   creep($Color.darkRed),
+                   "Cow Ant",
+                   "♥30")]));
+   }();
+   var statusView = function (model) {
+      return $Graphics$Element.centered($Text.height(25)($Text.fromString(A2($Basics._op["++"],
+      "♥",
+      A2($Basics._op["++"],
+      $Basics.toString(model.lives),
+      A2($Basics._op["++"],
+      "  $",
+      $Basics.toString(model.money)))))));
+   };
+   var instructionsView = function () {
+      var format = function (string) {
+         return A3($Graphics$Element.container,
+         panelWidth,
+         15,
+         $Graphics$Element.middle)($Graphics$Element.centered($Text.height(12)($Text.fromString(string))));
+      };
+      return A2($Graphics$Element.flow,
+      $Graphics$Element.down,
+      _L.fromArray([format("Click to plant trees that defend")
+                   ,format("against the invading ant horde!")]));
+   }();
+   var titleView = $Graphics$Element.centered($Text.height(30)($Text.bold($Text.fromString("Tree Defense"))));
+   var creepView = function (creep) {
+      return _U.eq(creep.delay,
+      0) ? function () {
+         var _v25 = creep.position;
+         switch (_v25.ctor)
+         {case "Just":
+            return $Maybe.Just($Graphics$Collage.move(translate(_v25._0))($Graphics$Collage.filled(creep.color)($Graphics$Collage.circle(tileSize / 4))));
+            case "Nothing":
+            return $Maybe.Nothing;}
+         _U.badCase($moduleName,
+         "between lines 310 and 318");
+      }() : $Maybe.Nothing;
    };
    var towerView = function (tower) {
       return function () {
-         var base = $Graphics$Collage.move(translate(tower.position))($Graphics$Collage.filled($Color.darkGray)($Graphics$Collage.circle(tileSize / 4)));
          var lineStyle = $Graphics$Collage.dotted($Color.charcoal);
          var halo = $Graphics$Collage.move(translate(tower.position))($Graphics$Collage.outlined(_U.replace([["width"
                                                                                                              ,1.5]],
          lineStyle))($Graphics$Collage.circle(tileSize * ($Basics.toFloat(tower.radius) + 0.5))));
-         return $Graphics$Collage.group(_L.fromArray([base
+         var image = $Graphics$Collage.move(translate(tower.position))($Graphics$Collage.toForm(A3($Graphics$Element.image,
+         $Basics.round(tileSize),
+         $Basics.round(tileSize),
+         "assets/tree-elm-grown.png")));
+         return $Graphics$Collage.group(_L.fromArray([image
                                                      ,halo]));
       }();
    };
    var projectileView = function (projectile) {
       return function () {
-         var lineStyle = $Graphics$Collage.defaultLine;
-         return $Graphics$Collage.traced(lineStyle)(A2($Graphics$Collage.segment,
-         translate(projectile.tower.position),
-         translate(projectile.creep.position)));
+         var $ = A2($Maybe.withDefault,
+         {ctor: "_Tuple2",_0: 0,_1: 0},
+         projectile.creep.position),
+         to_x = $._0,
+         to_y = $._1;
+         var $ = projectile.tower.position,
+         from_x = $._0,
+         from_y = $._1;
+         var percentage = projectile.position / (60 / 5);
+         var current = {ctor: "_Tuple2"
+                       ,_0: A3(ease,
+                       from_x,
+                       to_x,
+                       percentage)
+                       ,_1: A3(ease,
+                       from_y,
+                       to_y,
+                       percentage)};
+         return $Graphics$Collage.move(translateFloat(current))($Graphics$Collage.toForm(A3($Graphics$Element.image,
+         $Basics.round(tileSize / 4),
+         $Basics.round(tileSize / 4),
+         "assets/projectile.png")));
       }();
    };
+   var gameView = function (model) {
+      return A2($Graphics$Collage.collage,
+      mapSize,
+      A2($Debug.watch,
+      "mapSize",
+      mapSize))($List.append(_L.fromArray([mapView(model.map)]))($List.append(A2($List.map,
+      projectileView,
+      model.projectiles))($List.append(A2($List.map,
+      towerView,
+      model.towers))(A2($List.filterMap,
+      creepView,
+      model.creeps)))));
+   };
    var tileAt = F2(function (map,
-   _v23) {
+   _v27) {
       return function () {
-         switch (_v23.ctor)
+         switch (_v27.ctor)
          {case "_Tuple2":
             return A2($Maybe.andThen,
-              A2($Array.get,_v23._1,map),
-              $Array.get(_v23._0));}
+              A2($Array.get,_v27._1,map),
+              $Array.get(_v27._0));}
          _U.badCase($moduleName,
-         "on line 269, column 3 to 47");
+         "on line 220, column 3 to 47");
       }();
    });
-   var distance = F2(function (_v27,
-   _v28) {
+   var traversable = F2(function (maybePreviousPosition,
+   _v31) {
       return function () {
-         switch (_v28.ctor)
+         switch (_v31.ctor)
          {case "_Tuple2":
             return function () {
-                 switch (_v27.ctor)
-                 {case "_Tuple2":
-                    return $Basics.round($Basics.sqrt($Basics.toFloat(Math.pow(_v27._0 - _v28._0,
-                      2) + Math.pow(_v27._1 - _v28._1,
-                      2))));}
+                 switch (_v31._1.ctor)
+                 {case "Just":
+                    return _U.eq(_v31._1._0,
+                      $Models.Road) && function () {
+                         switch (maybePreviousPosition.ctor)
+                         {case "Just":
+                            return !_U.eq(_v31._0,
+                              maybePreviousPosition._0);
+                            case "Nothing": return true;}
+                         _U.badCase($moduleName,
+                         "between lines 212 and 215");
+                      }();
+                    case "Nothing": return false;}
                  _U.badCase($moduleName,
-                 "between lines 239 and 242");
+                 "between lines 210 and 216");
               }();}
          _U.badCase($moduleName,
-         "between lines 239 and 242");
+         "between lines 210 and 216");
+      }();
+   });
+   var initialPosition = function (map) {
+      return function () {
+         var column = A2($Array.map,
+         function (row) {
+            return $Maybe.withDefault($Models.Grass)(A2($Array.get,
+            0,
+            row));
+         },
+         map);
+         var row = $Basics.fst($Maybe.withDefault({ctor: "_Tuple2"
+                                                  ,_0: 0
+                                                  ,_1: $Models.Road})($List.head($List.filter(function (_v39) {
+            return function () {
+               switch (_v39.ctor)
+               {case "_Tuple2":
+                  return _U.eq(_v39._1,
+                    $Models.Road);}
+               _U.badCase($moduleName,
+               "on line 185, column 45 to 57");
+            }();
+         })($Array.toIndexedList(column)))));
+         return {ctor: "_Tuple2"
+                ,_0: 0
+                ,_1: row};
+      }();
+   };
+   var nextPosition = F2(function (map,
+   creep) {
+      return function () {
+         var _v43 = creep.position;
+         switch (_v43.ctor)
+         {case "Just":
+            switch (_v43._0.ctor)
+              {case "_Tuple2":
+                 return function () {
+                      var right = {ctor: "_Tuple2"
+                                  ,_0: _v43._0._0 + 1
+                                  ,_1: _v43._0._1};
+                      var down = {ctor: "_Tuple2"
+                                 ,_0: _v43._0._0
+                                 ,_1: _v43._0._1 - 1};
+                      var up = {ctor: "_Tuple2"
+                               ,_0: _v43._0._0
+                               ,_1: _v43._0._1 + 1};
+                      return $List.head($List.map($Basics.fst)($List.filter(traversable(creep.previousPosition))(A2($List.map,
+                      function (position) {
+                         return {ctor: "_Tuple2"
+                                ,_0: position
+                                ,_1: A2(tileAt,map,position)};
+                      },
+                      _L.fromArray([up
+                                   ,down
+                                   ,right])))));
+                   }();}
+              break;
+            case "Nothing":
+            return $Maybe.Just(initialPosition(map));}
+         _U.badCase($moduleName,
+         "between lines 194 and 206");
+      }();
+   });
+   var distance = F2(function (_v47,
+   _v48) {
+      return function () {
+         switch (_v48.ctor)
+         {case "_Tuple2":
+            return function () {
+                 switch (_v47.ctor)
+                 {case "_Tuple2":
+                    return $Basics.round($Basics.sqrt($Basics.toFloat(Math.pow(_v47._0 - _v48._0,
+                      2) + Math.pow(_v47._1 - _v48._1,
+                      2))));}
+                 _U.badCase($moduleName,
+                 "between lines 175 and 178");
+              }();}
+         _U.badCase($moduleName,
+         "between lines 175 and 178");
       }();
    });
    var inRange = F2(function (tower,
    creep) {
-      return _U.cmp(A2(distance,
-      tower.position,
-      creep.position),
-      tower.radius) < 1;
+      return function () {
+         var _v55 = creep.position;
+         switch (_v55.ctor)
+         {case "Just":
+            return _U.cmp(A2(distance,
+              tower.position,
+              _v55._0),
+              tower.radius) < 1;
+            case "Nothing": return false;}
+         _U.badCase($moduleName,
+         "between lines 167 and 171");
+      }();
    });
    var inBounds = F2(function (map,
-   _v35) {
+   _v57) {
       return function () {
-         switch (_v35.ctor)
+         switch (_v57.ctor)
          {case "_Tuple2":
             return function () {
                  var rows = $Array.length($Maybe.withDefault($Array.empty)(A2($Array.get,
                  0,
                  map)));
                  var columns = $Array.length(map);
-                 return _U.cmp(_v35._0,
-                 columns - 1) < 0 && _U.cmp(_v35._1,
+                 return _U.cmp(_v57._0,
+                 columns - 1) < 0 && _U.cmp(_v57._1,
                  rows - 1) < 0;
               }();}
          _U.badCase($moduleName,
-         "between lines 225 and 231");
+         "between lines 157 and 163");
+      }();
+   });
+   var updateProjectile = function (projectile) {
+      return _U.replace([["position"
+                         ,projectile.position + 1]],
+      projectile);
+   };
+   var updateCreep = F2(function (map,
+   creep) {
+      return _U.eq(creep.delay,
+      0) ? function () {
+         var _v61 = A2(nextPosition,
+         map,
+         creep);
+         switch (_v61.ctor)
+         {case "Just":
+            return $Maybe.Just(_U.replace([["position"
+                                           ,$Maybe.Just(_v61._0)]
+                                          ,["previousPosition"
+                                           ,creep.position]],
+              creep));
+            case "Nothing":
+            return $Maybe.Nothing;}
+         _U.badCase($moduleName,
+         "between lines 140 and 148");
+      }() : $Maybe.Just(_U.replace([["delay"
+                                    ,creep.delay - 1]],
+      creep));
+   });
+   var projectile = F2(function (creeps,
+   tower) {
+      return function () {
+         var creepsInRange = A2($List.filter,
+         inRange(tower),
+         creeps);
+         return $Maybe.map(function (creep) {
+            return A3($Models.Projectile,
+            tower,
+            creep,
+            0);
+         })($List.head(creepsInRange));
       }();
    });
    var creepAfterProjectiles = F2(function (projectiles,
@@ -9339,7 +9915,12 @@ Elm.TreeDefense.make = function (_elm) {
    var Tick = function (a) {
       return {ctor: "Tick",_0: a};
    };
-   var clockTicks = $Signal.map(Tick)($Time.fps(5));
+   var clockTicks = $Signal.map(Tick)($Time.fps(framesPerSecond));
+   var CreepTick = function (a) {
+      return {ctor: "CreepTick"
+             ,_0: a};
+   };
+   var creepTicks = $Signal.map(CreepTick)($Time.fps(creepVelocity));
    var Reset = {ctor: "Reset"};
    var Click = function (a) {
       return {ctor: "Click",_0: a};
@@ -9358,350 +9939,6 @@ Elm.TreeDefense.make = function (_elm) {
       return {ctor: "StateChange"
              ,_0: a};
    };
-   var NoOp = {ctor: "NoOp"};
-   var actions = $Signal.mailbox(NoOp);
-   var inputs = $Signal.mergeMany(_L.fromArray([actions.signal
-                                               ,clockTicks
-                                               ,mouseClicks
-                                               ,touches]));
-   var Road = {ctor: "Road"};
-   var traversable = F2(function (maybePreviousPosition,
-   _v39) {
-      return function () {
-         switch (_v39.ctor)
-         {case "_Tuple2":
-            return function () {
-                 switch (_v39._1.ctor)
-                 {case "Just":
-                    return _U.eq(_v39._1._0,
-                      Road) && function () {
-                         switch (maybePreviousPosition.ctor)
-                         {case "Just":
-                            return !_U.eq(_v39._0,
-                              maybePreviousPosition._0);
-                            case "Nothing": return true;}
-                         _U.badCase($moduleName,
-                         "between lines 261 and 264");
-                      }();
-                    case "Nothing": return false;}
-                 _U.badCase($moduleName,
-                 "between lines 259 and 265");
-              }();}
-         _U.badCase($moduleName,
-         "between lines 259 and 265");
-      }();
-   });
-   var nextPosition = F2(function (map,
-   creep) {
-      return function () {
-         var $ = creep.position,
-         x = $._0,
-         y = $._1;
-         var up = {ctor: "_Tuple2"
-                  ,_0: x
-                  ,_1: y + 1};
-         var down = {ctor: "_Tuple2"
-                    ,_0: x
-                    ,_1: y - 1};
-         var right = {ctor: "_Tuple2"
-                     ,_0: x + 1
-                     ,_1: y};
-         return $List.head($List.map($Basics.fst)($List.filter(traversable(creep.previousPosition))(A2($List.map,
-         function (position) {
-            return {ctor: "_Tuple2"
-                   ,_0: position
-                   ,_1: A2(tileAt,map,position)};
-         },
-         _L.fromArray([up
-                      ,down
-                      ,right])))));
-      }();
-   });
-   var updateCreep = F2(function (map,
-   creep) {
-      return function () {
-         var _v47 = creep.delay;
-         switch (_v47.ctor)
-         {case "Just":
-            return $Maybe.Just(_U.replace([["delay"
-                                           ,_U.eq(_v47._0,
-                                           0) ? $Maybe.Nothing : $Maybe.Just(_v47._0 - 1)]],
-              creep));
-            case "Nothing":
-            return function () {
-                 var _v49 = A2(nextPosition,
-                 map,
-                 creep);
-                 switch (_v49.ctor)
-                 {case "Just":
-                    return $Maybe.Just(_U.replace([["position"
-                                                   ,_v49._0]
-                                                  ,["previousPosition"
-                                                   ,$Maybe.Just(creep.position)]],
-                      creep));
-                    case "Nothing":
-                    return $Maybe.Nothing;}
-                 _U.badCase($moduleName,
-                 "between lines 214 and 221");
-              }();}
-         _U.badCase($moduleName,
-         "between lines 210 and 221");
-      }();
-   });
-   var Grass = {ctor: "Grass"};
-   var defaultMap = $Array.fromList(_L.fromArray([$Array.fromList(_L.fromArray([Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass]))
-                                                 ,$Array.fromList(_L.fromArray([Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Road
-                                                                               ,Road
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass]))
-                                                 ,$Array.fromList(_L.fromArray([Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass]))
-                                                 ,$Array.fromList(_L.fromArray([Road
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass]))
-                                                 ,$Array.fromList(_L.fromArray([Grass
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass]))
-                                                 ,$Array.fromList(_L.fromArray([Grass
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Road
-                                                                               ,Road
-                                                                               ,Road
-                                                                               ,Road]))
-                                                 ,$Array.fromList(_L.fromArray([Grass
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass]))
-                                                 ,$Array.fromList(_L.fromArray([Grass
-                                                                               ,Road
-                                                                               ,Road
-                                                                               ,Road
-                                                                               ,Road
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass]))
-                                                 ,$Array.fromList(_L.fromArray([Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass]))
-                                                 ,$Array.fromList(_L.fromArray([Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass
-                                                                               ,Grass]))]));
-   var Projectile = F2(function (a,
-   b) {
-      return {_: {}
-             ,creep: b
-             ,tower: a};
-   });
-   var projectile = F2(function (creeps,
-   tower) {
-      return function () {
-         var creepsInRange = A2($List.filter,
-         inRange(tower),
-         creeps);
-         return $Maybe.map(Projectile(tower))($List.head(creepsInRange));
-      }();
-   });
-   var Tower = F3(function (a,
-   b,
-   c) {
-      return {_: {}
-             ,damage: c
-             ,position: a
-             ,radius: b};
-   });
-   var Creep = F5(function (a,
-   b,
-   c,
-   d,
-   e) {
-      return {_: {}
-             ,color: d
-             ,delay: c
-             ,health: e
-             ,position: a
-             ,previousPosition: b};
-   });
-   var defaultCreeps = _L.fromArray([A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Nothing,
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(1),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(2),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(3),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(15),
-                                    $Color.red,
-                                    20)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(20),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(21),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(22),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(23),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(24),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(25),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(35),
-                                    $Color.red,
-                                    20)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(45),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(46),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(47),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(48),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(49),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(50),
-                                    $Color.lightBlue,
-                                    10)
-                                    ,A5(Creep,
-                                    {ctor: "_Tuple2",_0: 0,_1: 3},
-                                    $Maybe.Nothing,
-                                    $Maybe.Just(60),
-                                    $Color.darkRed,
-                                    30)]);
-   var Lost = {ctor: "Lost"};
-   var Won = {ctor: "Won"};
-   var Pause = {ctor: "Pause"};
-   var Play = {ctor: "Play"};
    var controlsView = F2(function (address,
    state) {
       return function () {
@@ -9716,105 +9953,85 @@ Elm.TreeDefense.make = function (_elm) {
                return A2($Graphics$Input.button,
                  A2($Signal.message,
                  address,
-                 StateChange(Play)),
+                 StateChange($Models.Play)),
                  "Play");
                case "Play":
                return A2($Graphics$Input.button,
                  A2($Signal.message,
                  address,
-                 StateChange(Pause)),
+                 StateChange($Models.Pause)),
                  "Pause");}
             _U.badCase($moduleName,
-            "between lines 360 and 365");
+            "between lines 344 and 349");
          }();
-         return _L.fromArray([play_or_pause
-                             ,reset]);
+         return A2($Graphics$Element.beside,
+         play_or_pause,
+         reset);
       }();
    });
-   var view = F3(function (address,
-   model,
-   _v52) {
-      return function () {
-         switch (_v52.ctor)
-         {case "_Tuple2":
-            return function () {
-                 var mapSize = $Basics.round(tileSize) * $Array.length(model.map);
-                 var graphics = $Graphics$Collage.move({ctor: "_Tuple2"
-                                                       ,_0: $Basics.toFloat(0 - mapSize) / 2 + tileSize
-                                                       ,_1: $Basics.toFloat(mapSize) / 2 - tileSize})($Graphics$Collage.group($List.append(_L.fromArray([mapView(model.map)]))($List.append(A2($List.map,
-                 projectileView,
-                 model.projectiles))($List.append(A2($List.map,
-                 towerView,
-                 model.towers))(A2($List.filterMap,
-                 creepView,
-                 model.creeps))))));
-                 return A2($Graphics$Element.flow,
-                 $Graphics$Element.right,
-                 _L.fromArray([$Graphics$Element.layers(_L.fromArray([A3($Graphics$Collage.collage,
-                                                                     mapSize,
-                                                                     mapSize,
-                                                                     _L.fromArray([graphics]))
-                                                                     ,A4($Graphics$Element.container,
-                                                                     mapSize,
-                                                                     mapSize,
-                                                                     $Graphics$Element.middle,
-                                                                     wonOrLostView(model.outcome))]))
-                              ,A2($Graphics$Element.flow,
-                              $Graphics$Element.down,
-                              _L.fromArray([A3($Graphics$Element.container,
-                                           150,
-                                           110,
-                                           $Graphics$Element.midBottom)(A2($Graphics$Element.flow,
-                                           $Graphics$Element.down,
-                                           A2(controlsView,
-                                           address,
-                                           model.state)))
-                                           ,A4($Graphics$Element.container,
-                                           150,
-                                           50,
-                                           $Graphics$Element.middle,
-                                           $Graphics$Element.centered($Text.fromString(A2($Basics._op["++"],
-                                           "♥ ",
-                                           $Basics.toString(model.lives)))))
-                                           ,A4($Graphics$Element.container,
-                                           150,
-                                           50,
-                                           $Graphics$Element.middle,
-                                           $Graphics$Element.centered($Text.fromString(A2($Basics._op["++"],
-                                           "$ ",
-                                           $Basics.toString(model.money)))))]))]));
-              }();}
-         _U.badCase($moduleName,
-         "between lines 303 and 322");
-      }();
+   var view = F2(function (address,
+   model) {
+      return A2($Graphics$Element.flow,
+      $Graphics$Element.right,
+      _L.fromArray([$Graphics$Element.layers(_L.fromArray([A4($Graphics$Element.container,
+                                                          mapSize,
+                                                          mapSize,
+                                                          $Graphics$Element.topLeft,
+                                                          gameView(model))
+                                                          ,A4($Graphics$Element.container,
+                                                          mapSize,
+                                                          mapSize,
+                                                          $Graphics$Element.middle,
+                                                          wonOrLostView(model.outcome))]))
+                   ,A2($Graphics$Element.spacer,
+                   10,
+                   mapSize)
+                   ,A2($Graphics$Element.flow,
+                   $Graphics$Element.down,
+                   _L.fromArray([A4($Graphics$Element.container,
+                                panelWidth,
+                                50,
+                                $Graphics$Element.middle,
+                                titleView)
+                                ,A4($Graphics$Element.container,
+                                panelWidth,
+                                50,
+                                $Graphics$Element.middle,
+                                instructionsView)
+                                ,A4($Graphics$Element.container,
+                                panelWidth,
+                                100,
+                                $Graphics$Element.middle,
+                                statusView(model))
+                                ,A4($Graphics$Element.container,
+                                panelWidth,
+                                mapSize - 250,
+                                $Graphics$Element.topLeft,
+                                legendView)
+                                ,A4($Graphics$Element.container,
+                                panelWidth,
+                                50,
+                                $Graphics$Element.middle,
+                                A2(controlsView,
+                                address,
+                                model.state))]))]));
    });
-   var Model = F8(function (a,
-   b,
-   c,
-   d,
-   e,
-   f,
-   g,
-   h) {
-      return {_: {}
-             ,creeps: d
-             ,lives: g
-             ,map: c
-             ,money: h
-             ,outcome: b
-             ,projectiles: f
-             ,state: a
-             ,towers: e};
-   });
-   var initialModel = A8(Model,
-   Pause,
+   var NoOp = {ctor: "NoOp"};
+   var actions = $Signal.mailbox(NoOp);
+   var inputs = $Signal.mergeMany(_L.fromArray([actions.signal
+                                               ,creepTicks
+                                               ,clockTicks
+                                               ,mouseClicks
+                                               ,touches]));
+   var initialModel = A8($Models.Model,
+   $Models.Pause,
    $Maybe.Nothing,
-   defaultMap,
-   defaultCreeps,
+   $Maps.defaultMap,
+   $Levels.levelOne,
    _L.fromArray([]),
    _L.fromArray([]),
    10,
-   200);
+   150);
    var update = F2(function (action,
    model) {
       return function () {
@@ -9824,7 +10041,7 @@ Elm.TreeDefense.make = function (_elm) {
                  var onGrass = _U.eq(A2(tileAt,
                  model.map,
                  action._0),
-                 $Maybe.Just(Grass));
+                 $Maybe.Just($Models.Grass));
                  var alreadyExists = A2($List.any,
                  function (tower) {
                     return _U.eq(tower.position,
@@ -9836,7 +10053,7 @@ Elm.TreeDefense.make = function (_elm) {
                  model.money) > 0;
                  return cantAfford || (alreadyExists || $Basics.not(onGrass)) ? model : _U.replace([["towers"
                                                                                                     ,A2($List._op["::"],
-                                                                                                    A3(Tower,
+                                                                                                    A3($Models.Tower,
                                                                                                     action._0,
                                                                                                     1,
                                                                                                     2),
@@ -9845,19 +10062,10 @@ Elm.TreeDefense.make = function (_elm) {
                                                                                                     ,model.money - towerCost]],
                  model);
               }();
-            case "NoOp": return model;
-            case "Reset":
-            return initialModel;
-            case "StateChange":
-            return _U.replace([["state"
-                               ,A2($Debug.watch,
-                               "state",
-                               action._0)]],
-              model);
-            case "Tick":
+            case "CreepTick":
             return function () {
-                 var _v60 = model.state;
-                 switch (_v60.ctor)
+                 var _v69 = model.state;
+                 switch (_v69.ctor)
                  {case "Pause": return model;
                     case "Play":
                     return function () {
@@ -9893,100 +10101,106 @@ Elm.TreeDefense.make = function (_elm) {
                                               ,model.money + killedCreepCount * 10]],
                          model) : _U.replace([["projectiles"
                                               ,_L.fromArray([])]
-                                             ,["outcome",$Maybe.Just(Won)]],
+                                             ,["outcome"
+                                              ,$Maybe.Just($Models.Won)]],
                          model) : _U.replace([["lives",0]
-                                             ,["outcome",$Maybe.Just(Lost)]],
+                                             ,["outcome"
+                                              ,$Maybe.Just($Models.Lost)]],
                          model);
                       }();}
                  _U.badCase($moduleName,
-                 "between lines 154 and 180");
+                 "between lines 73 and 101");
+              }();
+            case "NoOp": return model;
+            case "Reset":
+            return initialModel;
+            case "StateChange":
+            return _U.replace([["state"
+                               ,A2($Debug.watch,
+                               "state",
+                               action._0)]],
+              model);
+            case "Tick":
+            return function () {
+                 var _v70 = model.state;
+                 switch (_v70.ctor)
+                 {case "Pause": return model;
+                    case "Play":
+                    return function () {
+                         var updatedProjectiles = $Debug.watch("projectiles")(A2($List.map,
+                         updateProjectile,
+                         model.projectiles));
+                         return _U.replace([["projectiles"
+                                            ,updatedProjectiles]],
+                         model);
+                      }();}
+                 _U.badCase($moduleName,
+                 "between lines 102 and 109");
               }();}
          _U.badCase($moduleName,
-         "between lines 129 and 180");
+         "between lines 48 and 109");
       }();
    });
    var model = A3($Signal.foldp,
    update,
    initialModel,
    inputs);
-   var main = A3($Signal.map2,
+   var main = A2($Signal.map,
    view(actions.address),
-   model,
-   $Window.dimensions);
+   model);
    _elm.TreeDefense.values = {_op: _op
                              ,main: main
-                             ,Model: Model
-                             ,Play: Play
-                             ,Pause: Pause
-                             ,Won: Won
-                             ,Lost: Lost
-                             ,Creep: Creep
-                             ,Tower: Tower
-                             ,Projectile: Projectile
-                             ,Grass: Grass
-                             ,Road: Road
-                             ,defaultMap: defaultMap
-                             ,defaultCreeps: defaultCreeps
                              ,initialModel: initialModel
                              ,model: model
                              ,NoOp: NoOp
                              ,StateChange: StateChange
                              ,Click: Click
                              ,Reset: Reset
+                             ,CreepTick: CreepTick
                              ,Tick: Tick
                              ,update: update
                              ,creepsAfterProjectiles: creepsAfterProjectiles
                              ,creepAfterProjectiles: creepAfterProjectiles
                              ,projectile: projectile
                              ,updateCreep: updateCreep
+                             ,updateProjectile: updateProjectile
                              ,inBounds: inBounds
                              ,inRange: inRange
                              ,distance: distance
+                             ,initialPosition: initialPosition
                              ,nextPosition: nextPosition
                              ,traversable: traversable
                              ,tileAt: tileAt
                              ,actions: actions
                              ,clockTicks: clockTicks
+                             ,creepTicks: creepTicks
                              ,mouseClicks: mouseClicks
                              ,touches: touches
                              ,inputs: inputs
                              ,view: view
+                             ,gameView: gameView
                              ,projectileView: projectileView
                              ,towerView: towerView
                              ,creepView: creepView
+                             ,titleView: titleView
+                             ,instructionsView: instructionsView
                              ,controlsView: controlsView
+                             ,statusView: statusView
+                             ,legendView: legendView
+                             ,legendItemView: legendItemView
                              ,mapView: mapView
                              ,columnView: columnView
                              ,tileView: tileView
                              ,wonOrLostView: wonOrLostView
+                             ,ease: ease
                              ,translate: translate
+                             ,translateFloat: translateFloat
                              ,inverseTranslate: inverseTranslate
-                             ,tileSize: tileSize};
+                             ,mapSize: mapSize
+                             ,panelWidth: panelWidth
+                             ,gridSize: gridSize
+                             ,tileSize: tileSize
+                             ,framesPerSecond: framesPerSecond
+                             ,creepVelocity: creepVelocity};
    return _elm.TreeDefense.values;
-};Elm.Window = Elm.Window || {};
-Elm.Window.make = function (_elm) {
-   "use strict";
-   _elm.Window = _elm.Window || {};
-   if (_elm.Window.values)
-   return _elm.Window.values;
-   var _op = {},
-   _N = Elm.Native,
-   _U = _N.Utils.make(_elm),
-   _L = _N.List.make(_elm),
-   $moduleName = "Window",
-   $Basics = Elm.Basics.make(_elm),
-   $Native$Window = Elm.Native.Window.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var dimensions = $Native$Window.dimensions;
-   var width = A2($Signal.map,
-   $Basics.fst,
-   dimensions);
-   var height = A2($Signal.map,
-   $Basics.snd,
-   dimensions);
-   _elm.Window.values = {_op: _op
-                        ,dimensions: dimensions
-                        ,width: width
-                        ,height: height};
-   return _elm.Window.values;
 };</script></head><body><script type="text/javascript">Elm.fullscreen(Elm.TreeDefense)</script></body></html>

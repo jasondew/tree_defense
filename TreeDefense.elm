@@ -11,7 +11,6 @@ import Color exposing (Color)
 import Time exposing (Time)
 import Array exposing (Array)
 import Text
-import Window
 import Debug
 import Mouse
 import Touch

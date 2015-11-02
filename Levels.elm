@@ -3,8 +3,6 @@ module Levels where
 import Models exposing (..)
 import Creeps exposing (..)
 
-import Color exposing (Color)
-
 levelOne : List Creep
 levelOne =
   level [
@@ -29,6 +27,7 @@ levelOne =
   , ( 3, Just cowAnt)
   ]
 
+level : List (Int, Maybe (Int -> Creep)) -> List Creep
 level list =
   list
   |> List.map (\(repetitions, creep) -> List.repeat repetitions creep)

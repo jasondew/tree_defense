@@ -309,7 +309,7 @@ creepView creep =
   if creep.delay == 0 then
     case creep.position of
       Just position ->
-        Element.image (round <| tileSize / 2) (round <| tileSize / 2) "assets/ant.png"
+        Element.image (round tileSize) (round tileSize) "assets/ant.png"
         |> Collage.toForm
         |> Collage.move (translate position)
         |> Collage.rotate (creepRotation creep)

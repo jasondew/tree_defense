@@ -309,14 +309,36 @@ creepView creep =
   if creep.delay == 0 then
     case creep.position of
       Just position ->
-        Collage.circle (tileSize / 4)
-        |> Collage.filled creep.color
+        Element.image (round <| tileSize / 2) (round <| tileSize / 2) "assets/ant.png"
+        |> Collage.toForm
         |> Collage.move (translate position)
+        |> Collage.rotate (creepRotation creep)
         |> Just
       Nothing ->
         Nothing
   else
     Nothing
+
+creepRotation : Creep -> Float
+creepRotation creep =
+  let
+    defaultRotation = degrees 0
+  in
+    case creep.previousPosition of
+      Just previousPosition ->
+        case creep.position of
+          Just position ->
+            let
+              (lastX, lastY) = previousPosition
+              (x, y) = position
+              delta = (x - lastX, y - lastY)
+            in
+              case delta of
+                ( 0,  1) -> degrees 270
+                ( 0, -1) -> degrees 90
+                ( 1,  0) -> degrees 0
+          Nothing -> defaultRotation
+      Nothing -> defaultRotation
 
 titleView : Element
 titleView =
@@ -359,13 +381,6 @@ statusView model =
 legendView : Element
 legendView =
   let
-    size = tileSize / 3
-           |> round
-    image = Element.image size size
-    creep color = Collage.circle (tileSize / 9)
-                  |> Collage.filled color
-                  |> (flip (::)) []
-                  |> Collage.collage size size
     header string = Text.fromString string
                     |> Text.bold
                     |> Element.centered
@@ -376,18 +391,21 @@ legendView =
     Element.flow Element.down [
       header "Trees"
     , rule
-    , legendItemView (image "assets/tree-elm-grown.png") "Elm tree" "$50"
+    , legendItemView "tree-elm-grown" "Elm tree" "$50"
     , Element.spacer panelWidth 40
     , header "Enemies"
     , rule
-    , legendItemView (creep Color.black) "Ant" "♥10"
-    , legendItemView (creep Color.red) "Fire Ant" "♥20"
-    , legendItemView (creep Color.darkRed) "Cow Ant" "♥30"
+    , legendItemView "ant" "Ant" "♥10"
+    , legendItemView "ant" "Fire Ant" "♥20"
+    , legendItemView "ant" "Cow Ant" "♥30"
     ]
 
-legendItemView : Element -> String -> String -> Element
-legendItemView image title cost =
+legendItemView : String -> String -> String -> Element
+legendItemView imageName title cost =
   let
+    size = tileSize / 3
+           |> round
+    image = Element.image size size ("assets/" ++ imageName ++ ".png")
     text string = Text.fromString string
                   |> Text.height (tileSize / 3)
                   |> Element.centered

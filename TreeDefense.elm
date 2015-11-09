@@ -62,7 +62,7 @@ update action model =
         if cantAfford || alreadyExists || not onGrass
         then model
         else { model |
-               towers <- (Tower position 1 2) :: model.towers,
+               towers <- (Tower (Debug.watch "position" position) 1 2) :: model.towers,
                money <- model.money - towerCost
              }
 
@@ -243,7 +243,19 @@ mouseClicks =
 
 touches : Signal Action
 touches =
-  Signal.map (\touch -> Click (touch.x, touch.y)) Touch.taps
+  let
+    convert touches =
+      case List.head (Debug.watch "touches" touches) of
+        Just touch ->
+          let
+            coordinates = (touch.x0, touch.y0)
+            position = inverseTranslate coordinates
+          in
+            Just (Click position)
+        Nothing ->
+          Nothing
+  in
+    Signal.filterMap convert NoOp Touch.touches
 
 inputs : Signal Action
 inputs =
@@ -276,7 +288,7 @@ gameView model =
     |> List.append (List.map towerView model.towers)
     |> List.append (List.map projectileView model.projectiles)
     |> List.append [mapView model.map]
-    |> Collage.collage mapSize (Debug.watch "mapSize" mapSize)
+    |> Collage.collage mapSize mapSize
 
 projectileView : Projectile -> Form
 projectileView projectile =

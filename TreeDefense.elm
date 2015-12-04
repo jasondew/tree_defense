@@ -50,7 +50,7 @@ update action model =
       model
 
     StateChange newState ->
-      { model | state <- Debug.watch "state" newState }
+      { model | state = Debug.watch "state" newState }
 
     Click position ->
       let
@@ -62,8 +62,8 @@ update action model =
         if cantAfford || alreadyExists || not onGrass
         then model
         else { model |
-               towers <- (Tower (Debug.watch "position" position) 1 2) :: model.towers,
-               money <- model.money - towerCost
+               towers = (Tower (Debug.watch "position" position) 1 2) :: model.towers,
+               money = model.money - towerCost
              }
 
     Reset ->
@@ -86,15 +86,15 @@ update action model =
               if remainingCreeps > 0
               then
                 { model |
-                  creeps <- Debug.watch "creeps" updatedCreeps,
-                  projectiles <- Debug.watch "projectiles" projectiles,
-                  lives <- newLives,
-                  money <- model.money + killedCreepCount * 10
+                  creeps = Debug.watch "creeps" updatedCreeps,
+                  projectiles = Debug.watch "projectiles" projectiles,
+                  lives = newLives,
+                  money = model.money + killedCreepCount * 10
                 }
               else
-                { model | projectiles <- [], outcome <- Just Won }
+                { model | projectiles = [], outcome = Just Won }
             else
-              { model | lives <- 0, outcome <- Just Lost }
+              { model | lives = 0, outcome = Just Lost }
         Pause ->
           model
 
@@ -104,7 +104,7 @@ update action model =
           let
             updatedProjectiles = Debug.watch "projectiles" <| List.map updateProjectile model.projectiles
           in
-            { model | projectiles <- updatedProjectiles }
+            { model | projectiles = updatedProjectiles }
         Pause ->
           model
 
@@ -124,7 +124,7 @@ creepAfterProjectiles projectiles creep =
   in
     if totalDamage > creep.health
     then Nothing
-    else Just { creep | health <- creep.health - totalDamage }
+    else Just { creep | health = creep.health - totalDamage }
 
 projectile : List Creep -> Tower -> Maybe Projectile
 projectile creeps tower =
@@ -140,17 +140,17 @@ updateCreep map creep =
     case nextPosition map creep of
       Just newPosition ->
         Just { creep |
-               position <- Just newPosition,
-               previousPosition <- creep.position
+               position = Just newPosition,
+               previousPosition = creep.position
              }
       Nothing ->
         Nothing
   else
-    Just { creep | delay <- creep.delay - 1 }
+    Just { creep | delay = creep.delay - 1 }
 
 updateProjectile : Projectile -> Projectile
 updateProjectile projectile =
-  { projectile | position <- projectile.position + 1 }
+  { projectile | position = projectile.position + 1 }
 
 inBounds : Map -> Position -> Bool
 inBounds map (x, y) =
@@ -311,7 +311,7 @@ towerView tower =
             |> Collage.move (translate tower.position)
     lineStyle = Collage.dotted Color.charcoal
     halo = Collage.circle (tileSize * (toFloat tower.radius + 0.5))
-           |> Collage.outlined { lineStyle | width <- 1.5 }
+           |> Collage.outlined { lineStyle | width = 1.5 }
            |> Collage.move (translate tower.position)
   in
     Collage.group [image, halo]
@@ -349,6 +349,7 @@ creepRotation creep =
                 ( 0,  1) -> degrees 270
                 ( 0, -1) -> degrees 90
                 ( 1,  0) -> degrees 0
+                _        -> Debug.crash ("invalid delta: " ++ toString delta)
           Nothing -> defaultRotation
       Nothing -> defaultRotation
 
@@ -517,7 +518,7 @@ panelWidth = 200
 gridSize : number
 gridSize = 10
 
-tileSize : number
+tileSize : Float
 tileSize = mapSize / gridSize
 
 framesPerSecond : number
